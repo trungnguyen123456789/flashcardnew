@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -5,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🌸 Vocaby – Học Từ Vui Vẻ</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
         :root {
             --bg:#fef7ff;--bg2:#fdf2f8;--card:#ffffff;
@@ -28,7 +31,6 @@
         .hidden{display:none!important}
         ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--primary-light);border-radius:3px}
 
-        /* LOGIN */
         #login-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#fef7ff 0%,#fdf2f8 50%,#eff6ff 100%);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column}
         .login-deco{font-size:64px;margin-bottom:16px;animation:float 3s ease-in-out infinite}
         @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
@@ -40,7 +42,6 @@
         .login-btns{display:flex;gap:10px;margin-top:8px}
         #login-msg{color:var(--danger);font-size:12px;margin-top:12px;font-weight:700}
 
-        /* BUTTONS */
         .btn{padding:14px 20px;border-radius:14px;font-weight:800;cursor:pointer;border:none;width:100%;font-size:14px;font-family:inherit;transition:all .2s;letter-spacing:.3px}
         .btn-primary{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;box-shadow:0 4px 15px rgba(168,85,247,0.25)}
         .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(168,85,247,0.3)}
@@ -54,18 +55,15 @@
         .btn-icon{width:44px;height:44px;border-radius:12px;background:var(--card);border:2px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;transition:.2s;color:var(--text2)}
         .btn-icon:hover{border-color:var(--primary);color:var(--primary);transform:scale(1.05);box-shadow:var(--shadow)}
 
-        /* INPUTS */
         textarea,input[type=text],input[type=number],input[type=password],select{width:100%;padding:13px 16px;border-radius:var(--radius-sm);border:2px solid var(--border);background:var(--bg);color:var(--text);font-family:inherit;font-size:14px;outline:none;transition:.2s;margin-bottom:10px}
         textarea:focus,input:focus,select:focus{border-color:var(--primary);background:#fff;box-shadow:0 0 0 4px rgba(168,85,247,0.08)}
         select option{background:#fff}
 
-        /* TOP NAV */
         .top-nav{position:sticky;top:0;z-index:100;background:rgba(254,247,255,0.85);backdrop-filter:blur(20px);padding:12px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border)}
         .top-nav .logo{font-weight:900;font-size:20px;color:var(--primary);flex:1}
         .top-nav .logo span{color:var(--secondary)}
         .coin-pill{display:flex;align-items:center;gap:5px;background:var(--warning-light);color:#92400e;padding:6px 14px;border-radius:20px;font-weight:800;font-size:13px;border:1.5px solid #fde68a}
 
-        /* BOTTOM NAV */
         .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(255,255,255,0.92);backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:8px 0 12px;max-width:680px;margin:0 auto}
         .nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:4px 12px;border-radius:12px;transition:.2s;font-size:10px;font-weight:700;color:var(--text3)}
         .nav-item .nav-icon{font-size:22px;transition:.2s}
@@ -78,13 +76,11 @@
         .page.active{display:block}
         @keyframes pageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-        /* CARDS */
         .card{background:var(--card);border-radius:var(--radius);padding:20px;border:1.5px solid var(--border);margin-bottom:16px;box-shadow:var(--shadow-card);transition:.2s}
         .card:hover{box-shadow:var(--shadow)}
         .card-title{font-size:15px;font-weight:800;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:8px}
         .card-title .emoji{font-size:20px}
 
-        /* WORD LIST */
         .word-list{max-height:55vh;overflow-y:auto}
         .word-item{display:flex;align-items:center;gap:12px;padding:14px;background:var(--bg);margin-bottom:8px;border-radius:14px;border:1.5px solid transparent;transition:.2s}
         .word-item:hover{border-color:var(--primary-light);background:var(--card)}
@@ -93,7 +89,6 @@
         .cefr-A1{background:#d1fae5;color:#065f46}.cefr-A2{background:#cffafe;color:#155e75}.cefr-B1{background:#dbeafe;color:#1e3a8a}.cefr-B2{background:#e0e7ff;color:#312e81}.cefr-C1{background:#ede9fe;color:#4c1d95}.cefr-C2{background:#fce7f3;color:#831843}
         .tag-mastered{background:var(--success-light);color:var(--success)}.tag-learning{background:var(--warning-light);color:#92400e}
 
-        /* CHAT */
         .chat-box{height:300px;overflow-y:auto;background:var(--bg);border-radius:14px;padding:14px;border:1.5px solid var(--border);margin-bottom:10px;display:flex;flex-direction:column;gap:8px}
         .msg{padding:10px 14px;border-radius:14px;font-size:13px;max-width:80%;line-height:1.5;animation:msgIn .3s ease}
         @keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
@@ -102,13 +97,11 @@
         .typing-cursor::after{content:'▋';animation:blink .7s infinite;color:var(--primary)}
         @keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
 
-        /* LEARNING */
         #learning-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#fef7ff,#eff6ff);z-index:4000;display:flex;align-items:center;justify-content:center}
         .learn-card{width:92%;max-width:520px;background:var(--card);border-radius:28px;padding:32px;box-shadow:var(--shadow-lg);border:2px solid var(--border);text-align:center;position:relative}
         .learn-card::before{content:'';position:absolute;top:0;left:20%;right:20%;height:3px;background:linear-gradient(90deg,var(--primary),var(--secondary));border-radius:0 0 10px 10px}
         #fc-word{font-size:32px;font-weight:900;color:var(--primary);margin:16px 0 8px}
         #streak-display{color:var(--warning);font-weight:800;font-size:13px}
-        #wave-display{color:var(--accent);font-weight:800;font-size:12px;margin-top:4px}
         #timer-bar{width:100%;height:6px;background:var(--border);border-radius:10px;margin-bottom:20px;overflow:hidden;display:none}
         #timer-fill{width:100%;height:100%;background:linear-gradient(90deg,var(--warning),var(--danger));border-radius:10px;transition:width linear}
         .shake{animation:shake .5s both}
@@ -121,7 +114,6 @@
         .match-item.matched{border-color:var(--success);background:var(--success-light);color:var(--success);opacity:.6;pointer-events:none}
         .match-item.wrong{border-color:var(--danger);background:var(--danger-light);animation:shake .4s}
 
-        /* ZOO */
         .zoo-wrap{position:relative;width:100%;height:52vh;border-radius:var(--radius);overflow:hidden;border:2px solid var(--border);margin-bottom:12px;background:linear-gradient(180deg,#bae6fd 0%,#e0f2fe 40%,#bbf7d0 60%,#86efac 100%)}
         .zoo-wrap canvas{display:block;width:100%;height:100%}
         .zoo-hud{position:absolute;top:10px;right:10px;background:rgba(255,255,255,0.85);backdrop-filter:blur(10px);padding:6px 14px;border-radius:10px;font-weight:800;font-size:13px;color:#92400e;border:1.5px solid #fde68a}
@@ -131,7 +123,6 @@
         .zoo-btn{padding:10px 16px;border-radius:12px;background:var(--card);border:1.5px solid var(--border);font-size:12px;font-weight:700;cursor:pointer;transition:.2s;color:var(--text2);font-family:inherit}
         .zoo-btn:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
 
-        /* MODALS */
         .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);z-index:5000;display:none;align-items:center;justify-content:center}
         .modal-overlay.show{display:flex}
         .modal-box{width:92%;max-width:560px;background:var(--card);border-radius:24px;padding:24px;max-height:85vh;overflow-y:auto;box-shadow:var(--shadow-lg);border:2px solid var(--border);animation:modalPop .3s cubic-bezier(.34,1.56,.64,1)}
@@ -170,6 +161,19 @@
         .tab{padding:9px 16px;cursor:pointer;color:var(--text3);font-weight:700;white-space:nowrap;border-radius:11px;transition:.2s;font-size:13px}
         .tab:hover{color:var(--text2);background:rgba(168,85,247,0.05)}
         .tab.active{background:var(--card);color:var(--primary);box-shadow:var(--shadow-card)}
+        .incubator-list{display:flex;gap:12px;overflow-x:auto;padding:8px 0}
+        .pet-select-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:12px}
+        .pet-select-item{border:2px solid var(--border);border-radius:16px;padding:8px;text-align:center;cursor:pointer;transition:.2s}
+        .pet-select-item:hover{border-color:var(--primary)}
+        .pet-select-item img{width:80px;height:80px;object-fit:cover;border-radius:12px}
+
+        /* --- CSS MỚI --- */
+        .incubator-slot{position:relative;background:var(--bg);border:2px dashed var(--border);border-radius:16px;padding:12px;margin:8px 0;text-align:center;min-width:130px}
+        .incubator-slot.filled{border-style:solid;border-color:var(--primary)}
+        .progress-bar{height:10px;background:#e5e7eb;border-radius:9999px;overflow:hidden;margin:8px 0}
+        .progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--secondary));transition:width .4s}
+        .inc-timer{font-size:14px;font-weight:700;color:var(--danger);text-align:center}
+        .pet-img{width:60px;height:60px;object-fit:cover;border-radius:12px}
     </style>
 </head>
 <body>
@@ -196,7 +200,6 @@
 </div>
 
 <div class="app">
-    <!-- WORDS PAGE -->
     <div id="words-page" class="page active">
         <div class="card">
             <div class="card-title"><span class="emoji">✨</span> Thêm từ mới</div>
@@ -220,7 +223,6 @@
         </div>
     </div>
 
-    <!-- LEARN PAGE -->
     <div id="learn-page" class="page">
         <div class="card">
             <div class="card-title"><span class="emoji">⚡</span> Cấu hình học tập</div>
@@ -241,32 +243,31 @@
         </div>
     </div>
 
-    <!-- ZOO PAGE -->
     <div id="zoo-page" class="page">
         <div class="eco-card">
-            <div class="sec-label">🥚 LỒNG ẤP</div>
-            <canvas id="egg-canvas" width="80" height="80" style="width:80px;margin:8px auto;display:block"></canvas>
-            <div id="eco-name" style="font-weight:800;font-size:14px;color:var(--primary-dark);margin-top:6px">Trứng</div>
-            <div class="hatch-bar"><div id="eco-progress" class="hatch-fill" style="width:0%"></div></div>
-            <div id="hatch-timer" style="font-size:11px;color:var(--text2);margin-top:6px">Học <b id="xp-needed">3</b> từ để nở</div>
-            <button class="btn btn-success btn-sm" style="margin-top:10px" onclick="hatchEgg()">🥚 Ấp Trứng</button>
+            <div class="sec-label">🥚 LÒ ẤP (<span id="incubator-count">1</span> lò)</div>
+            <div class="incubator-list" id="incubator-list"></div>
+            <button class="btn btn-success btn-sm" style="margin-top:10px" onclick="buyIncubatorSlot()">🛒 Mua thêm lò (200 Xu)</button>
         </div>
         <div class="card">
-            <div class="card-title"><span class="emoji">🦁</span> Sở Thú</div>
+            <div class="card-title"><span class="emoji">🦁</span> Sở Thú 
+                <select id="zoo-area-select" onchange="changeZooArea()" style="margin-left:auto;font-size:13px;border:none;background:transparent;font-weight:700;color:var(--primary)"></select>
+            </div>
             <div class="zoo-wrap">
                 <canvas id="zooCanvas"></canvas>
                 <div class="zoo-hud">🪙 <span id="zoo-coins">0</span></div>
                 <div class="visitor-toast" id="visitor-toast">🧑 Khách ghé thăm! +5 Xu</div>
             </div>
             <div class="zoo-controls">
-                <button class="zoo-btn" onclick="openInvForZoo()">🎒 Thả Thú</button>
-                <button class="zoo-btn" onclick="openModal('breed-modal')">🧬 Lai Tạo</button>
+                <button class="zoo-btn" onclick="openPetSelectModal('release')">🎒 Thả Thú</button>
+                <button class="zoo-btn" onclick="openBreedModal()">🧬 Lai Tạo</button>
                 <button class="zoo-btn" onclick="feedAll()">🍖 Cho Ăn (5xu)</button>
+                <button class="zoo-btn" onclick="openForestModal()">🌲 Đi Rừng Săn</button>
+                <button class="zoo-btn" onclick="openPVPModal()">⚔️ PVP</button>
             </div>
         </div>
     </div>
 
-    <!-- CHAT PAGE -->
     <div id="chat-page" class="page">
         <div class="card">
             <div class="card-title"><span class="emoji">💬</span> Chat với AI Teacher</div>
@@ -278,9 +279,8 @@
         </div>
     </div>
 
-    <!-- MORE PAGE -->
     <div id="more-page" class="page">
-        <div class="card" onclick="openModal('shop-modal')" style="cursor:pointer"><div style="display:flex;align-items:center;gap:14px"><span style="font-size:36px">🛒</span><div><div style="font-weight:800;font-size:15px">Cửa Hàng</div><div style="font-size:12px;color:var(--text2)">Mua trứng, gacha, vật phẩm</div></div></div></div>
+        <div class="card" onclick="openModal('shop-modal')" style="cursor:pointer"><div style="display:flex;align-items:center;gap:14px"><span style="font-size:36px">🛒</span><div><div style="font-weight:800;font-size:15px">Cửa Hàng</div><div style="font-size:12px;color:var(--text2)">Mua trứng, gacha, lò ấp, pokeball...</div></div></div></div>
         <div class="card" onclick="openModal('inv-modal')" style="cursor:pointer"><div style="display:flex;align-items:center;gap:14px"><span style="font-size:36px">🎒</span><div><div style="font-weight:800;font-size:15px">Túi Đồ</div><div style="font-size:12px;color:var(--text2)">Quản lý thú cưng</div></div></div></div>
         <div class="card" onclick="openModal('daily-modal')" style="cursor:pointer"><div style="display:flex;align-items:center;gap:14px"><span style="font-size:36px">📅</span><div><div style="font-weight:800;font-size:15px">Điểm Danh</div><div style="font-size:12px;color:var(--text2)">Nhận xu hàng ngày</div></div></div></div>
         <div class="card"><div style="display:flex;align-items:center;gap:14px"><span style="font-size:36px">👤</span><div><div style="font-weight:800;font-size:15px" id="more-username">Khách</div><div style="font-size:12px;color:var(--text2)">Đã thuộc: <b id="more-learned">0</b> từ</div></div></div><button class="btn btn-danger btn-sm" style="margin-top:12px" onclick="logout()">Đăng xuất</button></div>
@@ -295,14 +295,21 @@
     <div class="nav-item" onclick="switchPage('more',this)"><span class="nav-icon">☰</span>Thêm</div>
 </div>
 
-<!-- MODALS -->
-<div class="modal-overlay" id="shop-modal"><div class="modal-box"><div class="modal-header"><h3>🛒 Cửa Hàng</h3><button class="modal-close" onclick="closeModal('shop-modal')">✕</button></div><div class="grid" id="shop-grid"></div></div></div>
+<div class="modal-overlay" id="shop-modal">
+    <div class="modal-box">
+        <div class="modal-header"><h3>🛒 Cửa Hàng</h3><button class="modal-close" onclick="closeModal('shop-modal')">✕</button></div>
+        <div class="grid" id="shop-grid"></div>
+        <div id="active-incubators" style="margin-top:20px"></div>
+    </div>
+</div>
 <div class="modal-overlay" id="inv-modal"><div class="modal-box"><div class="modal-header"><h3>🎒 Túi Đồ</h3><button class="modal-close" onclick="closeModal('inv-modal')">✕</button></div><div class="tabs" id="inv-tabs"><div class="tab active" onclick="renderInv('pet',this)">Thú Cưng</div><div class="tab" onclick="renderInv('item',this)">Vật Phẩm</div></div><div class="grid" id="inv-grid"></div></div></div>
 <div class="modal-overlay" id="daily-modal"><div class="modal-box"><div class="modal-header"><h3>📅 Điểm Danh</h3><button class="modal-close" onclick="closeModal('daily-modal')">✕</button></div><div class="daily-row" id="daily-grid"></div><div style="text-align:center;margin-top:16px"><button id="claim-btn" class="btn btn-primary" onclick="claimDaily()" style="width:180px">Nhận Thưởng</button><div id="claim-msg" style="color:var(--success);font-weight:700;margin-top:8px"></div></div></div></div>
-<div class="modal-overlay" id="breed-modal"><div class="modal-box"><div class="modal-header"><h3>🧬 Lai Tạo</h3><button class="modal-close" onclick="closeModal('breed-modal')">✕</button></div><p style="text-align:center;font-size:13px;color:var(--text2);margin-bottom:10px">Chọn 2 thú để lai giống (50 Xu)</p><div class="breed-area"><div id="slot1" class="breed-slot" onclick="pickBreed(1)">?</div><span style="font-size:24px;color:var(--text3)">✦</span><div id="slot2" class="breed-slot" onclick="pickBreed(2)">?</div></div><button class="btn btn-primary" onclick="doBreed()">🧬 Lai Tạo (50 Xu)</button></div></div>
+<div class="modal-overlay" id="breed-modal"><div class="modal-box"><div class="modal-header"><h3>🧬 Lai Tạo</h3><button class="modal-close" onclick="closeModal('breed-modal')">✕</button></div><p style="text-align:center;font-size:13px;color:var(--text2);margin-bottom:10px">Chọn 2 thú trưởng thành (50 Xu)</p><div id="breed-pet-list" class="pet-select-grid"></div><button class="btn btn-primary" onclick="doBreed()" style="margin-top:16px">Lai Tạo Ngay (50 Xu)</button></div></div>
+<div class="modal-overlay" id="pet-select-modal"><div class="modal-box"><div class="modal-header"><h3 id="pet-select-title">Chọn Thú</h3><button class="modal-close" onclick="closePetSelectModal()">✕</button></div><div id="pet-select-grid" class="pet-select-grid"></div></div></div>
+<div class="modal-overlay" id="forest-modal"><div class="modal-box"><div class="modal-header"><h3>🌲 Đi Rừng Săn Thú</h3><button class="modal-close" onclick="closeModal('forest-modal')">✕</button></div><div id="forest-options"></div><div id="forest-hunt-area" class="hidden"><div style="text-align:center"><div id="forest-timer" style="font-size:24px;font-weight:900;color:var(--danger)">60</div><button class="btn btn-primary" onclick="catchInForest()" style="margin:20px 0">🎾 Ném Pokeball</button><div id="forest-log" style="height:200px;overflow-y:auto;background:#f8fafc;border-radius:12px;padding:10px;font-size:13px"></div></div></div></div></div>
+<div class="modal-overlay" id="pvp-modal"><div class="modal-box"><div class="modal-header"><h3>⚔️ PVP (Chọn 5 thú đấu)</h3><button class="modal-close" onclick="closeModal('pvp-modal')">✕</button></div><p style="text-align:center;color:var(--text2)">Tính năng đang hoàn thiện - sẽ cập nhật sớm</p><button class="btn btn-primary" onclick="closeModal('pvp-modal')">Quay lại</button></div></div>
 <div class="modal-overlay" id="hatch-modal"><div class="modal-box" style="text-align:center"><h2 style="color:var(--success);margin-bottom:8px">🎉 Trứng Đã Nở!</h2><div id="hatch-title" style="font-weight:800;font-size:16px;color:var(--primary);margin-bottom:12px"></div><div id="hatch-img-wrap" style="margin:0 auto 12px"></div><p style="font-weight:700">+<span id="hatch-reward">10</span> Xu 🪙</p><div style="display:flex;gap:10px;margin-top:16px"><button class="btn btn-primary" onclick="growCreature()">Nuôi Lớn (30 Xu)</button><button class="btn btn-outline" onclick="keepBaby()">Cất vào Túi</button></div></div></div>
 
-<!-- LEARNING SCREEN -->
 <div id="learning-screen" class="hidden">
     <div class="learn-card">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
@@ -312,7 +319,6 @@
         <div id="timer-bar"><div id="timer-fill"></div></div>
         <div id="flashcard-area">
             <div id="streak-display">🔥 Streak: 0/3</div>
-            <div id="wave-display"></div>
             <div id="fc-word">Word</div>
             <button id="speakBtn" onclick="speakCurrent()" style="background:none;border:none;font-size:30px;cursor:pointer;display:none;color:var(--primary);margin:8px auto;width:auto">🔊</button>
             <div id="fc-hint" style="color:var(--text2);font-size:13px;margin-top:6px;font-style:italic;min-height:20px"></div>
@@ -325,127 +331,107 @@
 </div>
 
 <script>
-/* ==========================================
-   DATA & STATE
-   ========================================== */
-let usersDB=JSON.parse(localStorage.getItem('vocaby_v4'))||{};
-let currentUser=null;
-let ud={data:[],coins:0,lastLogin:'',loginStreak:0,eco:{xp:0,dna:null,collection:[],entities:[]},hatchStart:null};
+// ==========================================
+// FIREBASE
+// ==========================================
+const firebaseConfig = {
+    apiKey: "AIzaSyCWZHCnZRrOrX7n-fsUGJw8iTynWIK4cKQ",
+    authDomain: "daichienlophoc.firebaseapp.com",
+    databaseURL: "https://daichienlophoc-default-rtdb.firebaseio.com",
+    projectId: "daichienlophoc",
+    storageBucket: "daichienlophoc.firebasestorage.app",
+    messagingSenderId: "918701241713",
+    appId: "1:918701241713:web:a820e86139d713649c72d0",
+    measurementId: "G-D0HP049N33"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-function petImageUrl(name,rarity){
-    let s;
-    if(rarity==='legendary') s='epic powerful majestic glowing aura, extremely badass OR extremely adorable kawaii chibi';
-    else if(rarity==='rare') s='magical sparkly beautiful, super cute OR super cool';
-    else s='cute kawaii chibi adorable';
-    return `https://image.pollinations.ai/prompt/${encodeURIComponent(s+' '+name+', cartoon, pastel colors, white background, game character')}&width=200&height=200&nologo=true&seed=${hashStr(name)}`;
-}
-function hashStr(s){let h=0;for(let i=0;i<s.length;i++)h=((h<<5)-h)+s.charCodeAt(i);return Math.abs(h)}
+let currentUser = null;
+let ud = {data:[],coins:300,lastLogin:'',loginStreak:0,eco:{xp:0,incubators:[{id:1,dna:null,startTime:null,baseDuration:60000}],collection:[],entities:[],areas:[{id:1,name:'Khu 1',entities:[]}]},hatchStart:null,items:[]};
 
-/* ==========================================
-   CREATURES — bậc cao = cực dễ thương hoặc cực ngầu
-   ========================================== */
-const CREATURES={
-    common:[
-        {type:'dog',name:'Chó Con',e:'🐕'},{type:'cat',name:'Mèo Mướp',e:'🐱'},
-        {type:'rabbit',name:'Thỏ Trắng',e:'🐰'},{type:'chicken',name:'Gà Chip',e:'🐔'},
-        {type:'fish',name:'Cá Vàng',e:'🐟'},{type:'bird',name:'Chim Sẻ',e:'🐦'},
-        {type:'fox',name:'Cáo Lửa',e:'🦊'},{type:'turtle',name:'Rùa Cạn',e:'🐢'},
-        {type:'panda',name:'Gấu Trúc',e:'🐼'},{type:'pig',name:'Heo Ống',e:'🐷'},
-        {type:'hamster',name:'Chuột Hamster',e:'🐹'},{type:'koala',name:'Gấu Koala',e:'🐨'}
+// ==========================================
+// HỆ THỐNG HỆ (ĐÃ MỞ RỘNG)
+// ==========================================
+const ELEMENTS = ["earth","fire","water","air","grass","poison","flying","bug","ice","rock","electric","dark","light","cosmic"];
+
+const CREATURES = {
+    common: [
+        {type:'dog',name:'Chó Con',e:'🐕',rarity:'common',element:'earth'},{type:'cat',name:'Mèo Mướp',e:'🐱',rarity:'common',element:'earth'},{type:'rabbit',name:'Thỏ Trắng',e:'🐰',rarity:'common',element:'earth'},{type:'chicken',name:'Gà Chip',e:'🐔',rarity:'common',element:'flying'},{type:'fish',name:'Cá Vàng',e:'🐟',rarity:'common',element:'water'},{type:'bird',name:'Chim Sẻ',e:'🐦',rarity:'common',element:'flying'},{type:'fox',name:'Cáo Lửa',e:'🦊',rarity:'common',element:'fire'},{type:'turtle',name:'Rùa Cạn',e:'🐢',rarity:'common',element:'rock'},{type:'panda',name:'Gấu Trúc',e:'🐼',rarity:'common',element:'grass'},{type:'pig',name:'Heo Ống',e:'🐷',rarity:'common',element:'earth'},
+        {type:'hamster',name:'Chuột Hamster',e:'🐹',rarity:'common',element:'earth'},{type:'koala',name:'Gấu Koala',e:'🐨',rarity:'common',element:'grass'},{type:'duck',name:'Vịt Con',e:'🦆',rarity:'common',element:'water'},{type:'cow',name:'Bò Sữa',e:'🐮',rarity:'common',element:'earth'},{type:'sheep',name:'Cừu Non',e:'🐑',rarity:'common',element:'earth'},{type:'lion',name:'Sư Tử Con',e:'🦁',rarity:'common',element:'fire'},{type:'tiger',name:'Hổ Con',e:'🐅',rarity:'common',element:'fire'},{type:'elephant',name:'Voi Con',e:'🐘',rarity:'common',element:'earth'},{type:'monkey',name:'Khỉ Con',e:'🐒',rarity:'common',element:'air'},{type:'penguin',name:'Chim Cánh Cụt',e:'🐧',rarity:'common',element:'ice'},
+        {type:'frog',name:'Ếch Nhỏ',e:'🐸',rarity:'common',element:'water'},{type:'snake',name:'Rắn Con',e:'🐍',rarity:'common',element:'poison'},{type:'bear',name:'Gấu Nâu',e:'🐻',rarity:'common',element:'earth'},{type:'wolf',name:'Sói Con',e:'🐺',rarity:'common',element:'dark'},{type:'deer',name:'Hươu Con',e:'🦌',rarity:'common',element:'grass'},{type:'horse',name:'Ngựa Con',e:'🐴',rarity:'common',element:'earth'},{type:'zebra',name:'Ngựa Vằn',e:'🦓',rarity:'common',element:'earth'},{type:'giraffe',name:'Hươu Cao Cổ',e:'🦒',rarity:'common',element:'grass'},{type:'hippo',name:'Hà Mã Con',e:'🦛',rarity:'common',element:'water'},{type:'rhino',name:'Tê Giác Con',e:'🦏',rarity:'common',element:'rock'},
+        {type:'kangaroo',name:'Chuột Túi',e:'🦘',rarity:'common',element:'earth'},{type:'sloth',name:'Lười Con',e:'🦥',rarity:'common',element:'grass'},{type:'otter',name:'Rái Cá',e:'🦦',rarity:'common',element:'water'},{type:'seal',name:'Hải Cẩu',e:'🦭',rarity:'common',element:'ice'},{type:'shark',name:'Cá Mập Con',e:'🦈',rarity:'common',element:'water'},{type:'octopus',name:'Bạch Tuộc',e:'🐙',rarity:'common',element:'water'},{type:'crab',name:'Cua Con',e:'🦀',rarity:'common',element:'water'},{type:'butterfly',name:'Bướm',e:'🦋',rarity:'common',element:'bug'},{type:'bee',name:'Ong',e:'🐝',rarity:'common',element:'bug'},{type:'ant',name:'Kiến',e:'🐜',rarity:'common',element:'bug'},
+        {type:'spider',name:'Nhện',e:'🕷️',rarity:'common',element:'poison'},{type:'ladybug',name:'Bọ Rùa',e:'🐞',rarity:'common',element:'bug'},{type:'dragonfly',name:'Chuồn Chuồn',e:'🪰',rarity:'common',element:'flying'},{type:'caterpillar',name:'Sâu',e:'🐛',rarity:'common',element:'bug'},{type:'snail',name:'Ốc Sên',e:'🐌',rarity:'common',element:'grass'},{type:'hedgehog',name:'Nhím',e:'🦔',rarity:'common',element:'earth'},{type:'squirrel',name:'Sóc',e:'🐿️',rarity:'common',element:'earth'},{type:'raccoon',name:'Gấu Mèo',e:'🦝',rarity:'common',element:'dark'},{type:'bat',name:'Dơi',e:'🦇',rarity:'common',element:'dark'}
     ],
-    rare:[
-        {type:'baby dragon',name:'Rồng Con Siêu Cute',e:'🐲'},
-        {type:'unicorn',name:'Kỳ Lân Lấp Lánh',e:'🦄'},
-        {type:'phoenix chick',name:'Phượng Hoàng Non',e:'🔥'},
-        {type:'robot cat',name:'Mèo Robot Ngầu',e:'🤖'},
-        {type:'fairy fox',name:'Cáo Tiên Dễ Thương',e:'🧚'},
-        {type:'crystal wolf',name:'Sói Pha Lê',e:'🐺'}
-    ],
-    legendary:[
-        {type:'golden griffin',name:'Griffin Vàng Huyền Thoại',e:'🦅'},
-        {type:'celestial pegasus',name:'Pegasus Thiên Thần',e:'🐴'},
-        {type:'nine-tailed cosmic fox',name:'Cáo 9 Đuôi Vũ Trụ',e:'🦊'},
-        {type:'shadow dragon lord',name:'Chúa Tể Hắc Long',e:'🐉'},
-        {type:'divine sakura spirit',name:'Tinh Linh Hoa Anh Đào',e:'🌸'}
-    ]
+    rare: [{type:'phoenix',name:'Phượng Hoàng',e:'🔥',rarity:'rare',element:'fire'},{type:'unicorn',name:'Kỳ Lân',e:'🦄',rarity:'rare',element:'light'},{type:'dragon',name:'Rồng Con',e:'🐲',rarity:'rare',element:'fire'},{type:'mermaid',name:'Nàng Tiên Cá',e:'🧜‍♀️',rarity:'rare',element:'water'},{type:'fairy',name:'Tiên Nữ',e:'🧚',rarity:'rare',element:'light'},{type:'robot',name:'Robot',e:'🤖',rarity:'rare',element:'electric'},{type:'ninja cat',name:'Mèo Ninja',e:'🐱',rarity:'rare',element:'air'},{type:'ghost fox',name:'Cáo Ma',e:'🦊',rarity:'rare',element:'dark'},{type:'ice wolf',name:'Sói Băng',e:'🐺',rarity:'rare',element:'ice'},{type:'thunder bird',name:'Chim Sét',e:'🐦',rarity:'rare',element:'electric'},{type:'forest guardian',name:'Thủ Lâm',e:'🌳',rarity:'rare',element:'grass'},{type:'lava turtle',name:'Rùa Lửa',e:'🐢',rarity:'rare',element:'fire'},{type:'crystal deer',name:'Hươu Pha Lê',e:'🦌',rarity:'rare',element:'light'}],
+    ultraRare: [{type:'shadow dragon',name:'Rồng Bóng Tối',e:'🌑',rarity:'ultra',element:'dark'},{type:'golden phoenix',name:'Phượng Hoàng Vàng',e:'🔥',rarity:'ultra',element:'fire'},{type:'crystal unicorn',name:'Kỳ Lân Pha Lê',e:'🦄',rarity:'ultra',element:'light'},{type:'storm griffin',name:'Griffin Bão',e:'🦅',rarity:'ultra',element:'air'}],
+    legendary: [{type:'griffin',name:'Griffin Vàng',e:'🦅',rarity:'legendary',element:'flying'},{type:'pegasus',name:'Pegasus',e:'🐴',rarity:'legendary',element:'light'},{type:'nine-tailed fox',name:'Cáo 9 Đuôi',e:'🦊',rarity:'legendary',element:'fire'},{type:'ancient turtle',name:'Rùa Thần',e:'🐢',rarity:'legendary',element:'earth'},{type:'eternal dragon',name:'Rồng Vĩnh Cửu',e:'🐲',rarity:'legendary',element:'fire'}],
+    mythic: [{type:'cosmic whale',name:'Cá Voi Vũ Trụ',e:'🐋',rarity:'mythic',element:'cosmic'},{type:'void phoenix',name:'Phượng Hoàng Hư Vô',e:'🌌',rarity:'mythic',element:'dark'},{type:'eternal tree spirit',name:'Thần Cây Vĩnh Cửu',e:'🌳',rarity:'mythic',element:'grass'},{type:'star lion',name:'Sư Tử Sao',e:'🦁',rarity:'mythic',element:'light'},{type:'time fox',name:'Cáo Thời Gian',e:'🦊',rarity:'mythic',element:'cosmic'}]
 };
 
 function genCreature(r='common'){
-    const pool=CREATURES[r]||CREATURES.common;
-    const c=pool[Math.floor(Math.random()*pool.length)];
-    return{...c,rarity:r,stage:'baby',hunger:100,happiness:100,imgUrl:petImageUrl(c.type,r)};
+    const pool = CREATURES[r] || CREATURES.common;
+    const c = pool[Math.floor(Math.random()*pool.length)];
+    return {...c, stage:'baby', hunger:100, happiness:100, imgUrl: `https://image.pollinations.ai/prompt/${encodeURIComponent(c.rarity==='mythic'?'epic cosmic glowing':c.rarity==='legendary'?'epic fantasy glowing':'cute kawaii')} ${c.type}, chibi cartoon, pastel colors, white background&width=200&height=200&nologo=true&seed=${hashStr(c.type)}`};
 }
 
 function hybridize(p1,p2){
-    const coolPrefixes=['Siêu','Huyền','Thần','Ma','Vương','Linh','Thiên','Huyết','Băng','Lôi'];
-    const cutePrefixes=['Bé','Mini','Chibi','Tiny','Baby','Nhỏ'];
-    const isCute=Math.random()<0.5;
-    const prefixPool=isCute?cutePrefixes:coolPrefixes;
-    const pre=prefixPool[Math.floor(Math.random()*prefixPool.length)];
-    const n1=p1.name.split(' ').pop(),n2=p2.name.split(' ').pop();
-    const name=pre+' '+n1+'-'+n2;
-    
+    const pre=['Siêu','Huyền','Thần','Ma','Vương','Linh','Vô','Cực','Huyền Ảo'][Math.floor(Math.random()*9)];
+    const name=pre+' '+p1.name.split(' ').pop()+'-'+p2.name.split(' ').pop();
     let rarity='common';
-    if(p1.rarity==='legendary'||p2.rarity==='legendary') rarity=Math.random()<0.6?'legendary':'rare';
-    else if(p1.rarity==='rare'||p2.rarity==='rare') rarity=Math.random()<0.45?'rare':'common';
-    if(Math.random()<0.08) rarity='legendary';
-    
-    const ht=p1.type+' '+p2.type+' hybrid';
-    const emoji=Math.random()<0.5?p1.e:p2.e;
-    return{type:ht,name,e:emoji,rarity,stage:'baby',hunger:100,happiness:100,imgUrl:petImageUrl(ht+(isCute?' extremely adorable kawaii':' extremely badass cool powerful'),rarity)};
+    if(p1.rarity!=='common'&&p2.rarity!=='common')rarity=Math.random()<.5?'rare':'legendary';
+    else if(p1.rarity!=='common'||p2.rarity!=='common')rarity=Math.random()<.4?'rare':'common';
+    if(Math.random()<.08)rarity='ultra';
+    if(Math.random()<.03)rarity='legendary';
+    if(Math.random()<.005)rarity='mythic';
+    const ht=p1.type+'-'+p2.type;
+    return{...genCreature(rarity),name,type:ht,e:Math.random()<.5?p1.e:p2.e,stage:'baby',imgUrl:`https://image.pollinations.ai/prompt/${encodeURIComponent('dual element hybrid '+ht+', ultra cute or epic, chibi cartoon, pastel colors, white background')}&width=200&height=200&nologo=true&seed=${hashStr(ht)}`};
+}
+function hashStr(s){let h=0;for(let i=0;i<s.length;i++)h=((h<<5)-h)+s.charCodeAt(i);return Math.abs(h)}
+
+async function loadUserData(username){
+    return new Promise(resolve=>{
+        db.ref('users/'+username).once('value',snap=>{resolve(snap.val());});
+    });
+}
+async function saveUserData(){
+    if(currentUser) db.ref('users/'+currentUser).set(ud);
 }
 
-/* ==========================================
-   AUTH — Đăng ký nhận 300 xu
-   ========================================== */
-function handleLogin(type){
+async function handleLogin(type){
     const u=document.getElementById('username').value.trim(),p=document.getElementById('password').value.trim(),msg=document.getElementById('login-msg');
     if(!u||!p){msg.innerText='Nhập đủ thông tin!';return}
+    const existing=await loadUserData(u);
     if(type==='register'){
-        if(usersDB[u]){msg.innerText='Tài khoản đã tồn tại!';return}
-        usersDB[u]={password:p,data:[],coins:300,lastLogin:'',loginStreak:0,eco:{xp:0,dna:genCreature(),collection:[],entities:[]},hatchStart:null};
-        save();loginUser(u);
+        if(existing){msg.innerText='Tài khoản đã tồn tại!';return}
+        ud={password:p,data:[],coins:300,lastLogin:'',loginStreak:0,eco:{xp:0,incubators:[{id:1,dna:null,startTime:null,baseDuration:60000}],collection:[],entities:[],areas:[{id:1,name:'Khu 1',entities:[]}]},hatchStart:null,items:[]};
+        await db.ref('users/'+u).set(ud);
+        loginUser(u);
     }else{
-        if(!usersDB[u]||usersDB[u].password!==p){msg.innerText='Sai tài khoản/mật khẩu!';return}
+        if(!existing||existing.password!==p){msg.innerText='Sai tài khoản/mật khẩu!';return}
+        ud=existing;
         loginUser(u);
     }
 }
 function loginUser(u){
-    currentUser=u;ud=usersDB[u];
-    if(!ud.eco)ud.eco={xp:0,dna:genCreature(),collection:[],entities:[]};
-    if(!ud.eco.dna)ud.eco.dna=genCreature();
-    if(!ud.eco.collection)ud.eco.collection=[];
-    if(!ud.eco.entities)ud.eco.entities=[];
+    currentUser=u;
+    if(!ud.eco)ud.eco={xp:0,incubators:[{id:1,dna:null,startTime:null,baseDuration:60000}],collection:[],entities:[],areas:[{id:1,name:'Khu 1',entities:[]}]};
     document.getElementById('login-overlay').classList.add('hidden');
     updateUI();renderList();checkDailyLogin();
+    setInterval(saveUserData,15000);
 }
-function save(){if(currentUser){usersDB[currentUser]=ud;localStorage.setItem('vocaby_v4',JSON.stringify(usersDB))}}
-function logout(){location.reload()}
+function save(){saveUserData();}
+function logout(){location.reload();}
 function updateUI(){
     document.getElementById('coin-display').innerText=ud.coins;
     document.getElementById('zoo-coins').innerText=ud.coins;
     document.getElementById('more-username').innerText=currentUser||'Khách';
     document.getElementById('more-learned').innerText=ud.data.filter(w=>w.status==='mastered').length;
-    renderEgg();
+    renderIncubators();renderZooAreaSelect();
 }
 
-/* ==========================================
-   NAVIGATION
-   ========================================== */
-function switchPage(name,el){
-    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-    document.getElementById(name+'-page').classList.add('active');
-    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-    if(el)el.classList.add('active');
-    if(name==='zoo')initZoo();
-    if(name==='words')renderList();
-}
-function openModal(id){document.getElementById(id).classList.add('show');if(id==='shop-modal')renderShop();if(id==='inv-modal')renderInv('pet');if(id==='daily-modal')renderDaily()}
-function closeModal(id){document.getElementById(id).classList.remove('show')}
+const LEVEL_COINS={A1:5,A2:10,B1:15,B2:25,C1:40,C2:60};
 
-/* ==========================================
-   AI – POLLINATIONS TEXT API
-   ========================================== */
 async function callAI(prompt){try{const r=await fetch(`https://text.pollinations.ai/${encodeURIComponent(prompt)}`);if(!r.ok)throw 0;return(await r.text()).trim()}catch(e){return null}}
 async function getDefinition(word){try{const r=await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);const d=await r.json();return d[0]?.meanings[0]?.definitions[0]?.definition||'No definition found.'}catch(e){return'Definition unavailable.'}}
 async function getAISuggestions(){
@@ -466,10 +452,6 @@ async function chatWithAI(){
 function appendMsg(t,cls){const b=document.getElementById('chatBox'),d=document.createElement('div');d.className='msg '+cls;d.innerText=t;b.appendChild(d);b.scrollTop=b.scrollHeight}
 function typeWriter(text){const b=document.getElementById('chatBox'),d=document.createElement('div');d.className='msg msg-ai typing-cursor';d.innerText='';b.appendChild(d);let i=0;const iv=setInterval(()=>{if(i<text.length){d.innerText+=text.charAt(i);i++;b.scrollTop=b.scrollHeight}else{clearInterval(iv);d.classList.remove('typing-cursor')}},22)}
 
-/* ==========================================
-   WORDS – AUTO DEFINITION
-   ========================================== */
-const LEVEL_COINS={A1:10,A2:15,B1:20,B2:30,C1:50,C2:80};
 async function addBulkWords(){
     const raw=document.getElementById('bulkInput').value.trim();
     if(!raw)return alert('Nhập từ trước!');
@@ -477,21 +459,16 @@ async function addBulkWords(){
     raw.split('\n').forEach(l=>{
         const p=l.split(/[-–:]/);
         if(p.length>=2){
-            const word=p[0].trim().replace(/^\d+\.\s*/,''),meaning=p.slice(1).join('-').trim();
+            const word=p[0].trim().replace(/^\d+\.\s*/,''),meaning=p[1].trim();
             if(word&&meaning&&!ud.data.find(w=>w.word.toLowerCase()===word.toLowerCase()))
                 nw.push({word,meaning,definition:'',status:'learning',streak:0,cefr:'B1',customDef:false});
         }
     });
     if(!nw.length)return alert('Không có từ mới!');
-
     const cefrPrompt=`You are a Cambridge/Oxford lexicographer. Classify CEFR for each word. "dog"=A1,"cat"=A1,"environment"=B1,"ubiquitous"=C2. Return ONLY JSON: [{"word":"dog","cefr":"A1"}]. Words: ${nw.map(w=>w.word).join(', ')}`;
     const cr=await callAI(cefrPrompt);
     if(cr){try{const m=cr.match(/\[[\s\S]*?\]/);if(m)JSON.parse(m[0]).forEach(c=>{const f=nw.find(w=>w.word.toLowerCase()===c.word?.toLowerCase());if(f&&c.cefr)f.cefr=c.cefr.toUpperCase()})}catch(e){}}
-
-    for(let w of nw){
-        w.definition=await getDefinition(w.word);
-    }
-
+    for(let w of nw){w.definition=await getDefinition(w.word);}
     ud.data.push(...nw);
     document.getElementById('bulkInput').value='';
     save();updateUI();renderList();
@@ -505,25 +482,26 @@ function renderList(){
     el.innerHTML=ud.data.map((w,i)=>`
         <div class="word-item">
             <div class="wi-info">
-                <div class="wi-word">${w.word}</div>
+                <div class="wi-word">${w.word} <button onclick="speakWord('${w.word}');event.stopImmediatePropagation()" style="background:none;border:none;font-size:18px;cursor:pointer">🔊</button></div>
                 <div class="wi-meaning">${w.meaning}</div>
                 ${w.definition?`<div class="wi-def">${w.definition}</div>`:''}
                 <div class="wi-tags">
                     <span class="tag cefr-${w.cefr||'B1'}">${w.cefr||'B1'}</span>
-                    <span class="tag ${w.status==='mastered'?'tag-mastered':'tag-learning'}">${w.status==='mastered'?'✅ Thuộc':'🔥 '+w.streak+'/3'}</span>
+                    <span class="tag ${w.status==='mastered'?'tag-mastered':'tag-learning'}">${w.status==='mastered'?'✅ Thuộc':'🔥 '+(w.streak||0)+'/3'}</span>
                 </div>
             </div>
             <div style="display:flex;gap:4px;flex-shrink:0">
-                <button class="btn-icon" style="width:32px;height:32px;font-size:14px" onclick="editWord(${i})">✏️</button>
-                <button class="btn-icon" style="width:32px;height:32px;font-size:14px;border-color:var(--danger-light);color:var(--danger)" onclick="deleteWord(${i})">🗑️</button>
+                <button class="btn-icon" style="width:32px;height:32px;font-size:14px" onclick="editWord(${i});event.stopImmediatePropagation()">✏️</button>
+                <button class="btn-icon" style="width:32px;height:32px;font-size:14px;border-color:var(--danger-light);color:var(--danger)" onclick="deleteWord(${i});event.stopImmediatePropagation()">🗑️</button>
             </div>
         </div>
     `).join('');
 }
+function speakWord(word){const u=new SpeechSynthesisUtterance(word);u.lang='en-US';speechSynthesis.speak(u);}
 function editWord(i){
     const w=ud.data[i];
     const nm=prompt('Sửa nghĩa:',w.meaning);if(nm!==null&&nm.trim())w.meaning=nm.trim();
-    const nd=prompt('Sửa định nghĩa:',w.definition||'');
+    const nd=prompt('Sửa định nghĩa (chỉ ảnh hưởng từ này):',w.definition||'');
     if(nd!==null){w.definition=nd.trim();w.customDef=true}
     const nc=prompt('Sửa CEFR (A1/A2/B1/B2/C1/C2):',w.cefr||'B1');
     if(nc&&['A1','A2','B1','B2','C1','C2'].includes(nc.toUpperCase()))w.cefr=nc.toUpperCase();
@@ -532,54 +510,79 @@ function editWord(i){
 function deleteWord(i){if(confirm('Xóa?')){ud.data.splice(i,1);save();renderList()}}
 function deleteAllWords(){if(confirm('Xóa TẤT CẢ?')){ud.data=[];save();renderList()}}
 
-/* ==========================================
-   ECO SYSTEM
-   ========================================== */
-function renderEgg(){
-    const c=document.getElementById('egg-canvas');if(!c)return;
-    const ctx=c.getContext('2d');ctx.clearRect(0,0,80,80);
-    if(ud.eco.xp<3){
-        const colors={common:'#fbbf24',rare:'#f472b6',legendary:'#a78bfa'};
-        ctx.fillStyle=colors[ud.eco.dna?.rarity]||'#fbbf24';
-        ctx.beginPath();ctx.ellipse(40,42,18,24,0,0,Math.PI*2);ctx.fill();
-        ctx.fillStyle='rgba(255,255,255,0.35)';ctx.beginPath();ctx.ellipse(34,34,5,8,-0.3,0,Math.PI*2);ctx.fill();
-        c.classList.add('anim-egg');
-        document.getElementById('eco-name').innerText='Trứng '+(ud.eco.dna?.rarity==='rare'?'HIẾM':ud.eco.dna?.rarity==='legendary'?'HUYỀN THOẠI':'Thường');
-    }else{
-        ctx.font='48px serif';ctx.textAlign='center';ctx.textBaseline='middle';
-        ctx.fillText(ud.eco.dna?.e||'🥚',40,40);
-        c.classList.remove('anim-egg');
-        document.getElementById('eco-name').innerText='Sẵn sàng nở!';
-    }
-    document.getElementById('eco-progress').style.width=(ud.eco.xp/3*100)+'%';
-    const timer=document.getElementById('hatch-timer');
-    if(ud.hatchStart){
-        const left=Math.max(0,60000-(Date.now()-ud.hatchStart));
-        timer.innerHTML=left>0?`⏰ Nở sau: <b>${Math.ceil(left/1000)}s</b>`:`✅ <b>Sẵn sàng nở!</b>`;
-    }else{
-        document.getElementById('xp-needed').innerText=3-ud.eco.xp;
-        timer.innerHTML=`Học <b>${3-ud.eco.xp}</b> từ để nở`;
-    }
-}
-function hatchEgg(){
-    if(ud.eco.xp<3)return alert(`Cần học thêm ${3-ud.eco.xp} từ!`);
-    if(!ud.hatchStart){ud.hatchStart=Date.now();save();updateUI();alert('Bắt đầu ấp! Đợi 1 phút...');return}
-    if(Date.now()-ud.hatchStart<60000){alert(`Còn ${Math.ceil((60000-(Date.now()-ud.hatchStart))/1000)}s!`);return}
-    ud.eco.xp=0;ud.hatchStart=null;ud.coins+=10;
-    ud.eco.dna.stage='baby';
-    document.getElementById('hatch-title').innerText=ud.eco.dna.name;
-    document.getElementById('hatch-reward').innerText='10';
-    document.getElementById('hatch-img-wrap').innerHTML=`<img src="${ud.eco.dna.imgUrl}" style="width:120px;height:120px;border-radius:16px;border:2px solid var(--border)">`;
-    openModal('hatch-modal');save();updateUI();
-}
 function gainXp(){ud.eco.xp++;if(ud.eco.xp>=3)ud.hatchStart=Date.now();save();updateUI()}
 function growCreature(){if(ud.coins<30)return alert('Cần 30 Xu!');ud.coins-=30;const a={...ud.eco.dna,stage:'adult'};ud.eco.collection.push(a);ud.eco.dna=genCreature();closeModal('hatch-modal');save();updateUI();alert('Đã nuôi lớn!')}
 function keepBaby(){ud.eco.collection.push({...ud.eco.dna});ud.eco.dna=genCreature();closeModal('hatch-modal');save();updateUI();alert('Đã cất vào Túi!')}
-setInterval(renderEgg,1000);
 
-/* ==========================================
-   INVENTORY
-   ========================================== */
+// ==========================================
+// LÒ ẤP CẢI TIẾN (thanh + thời gian)
+// ==========================================
+function renderIncubators(){
+    const container = document.getElementById('incubator-list');
+    container.innerHTML = '';
+    ud.eco.incubators.forEach((inc,i)=>{
+        const div = document.createElement('div');
+        div.className = `incubator-slot ${inc.dna?'filled':''}`;
+        if(inc.dna && inc.startTime){
+            const elapsed = Date.now() - inc.startTime;
+            const percent = Math.min(100, Math.floor((elapsed / inc.baseDuration)*100));
+            const leftSec = Math.max(0, Math.ceil((inc.baseDuration - elapsed)/1000));
+            div.innerHTML = `
+                <div style="font-size:32px">${inc.dna.e}</div>
+                <div style="font-size:13px;font-weight:700;">${inc.dna.name}</div>
+                <div class="progress-bar"><div class="progress-fill" style="width:${percent}%"></div></div>
+                <div class="inc-timer">⏳ ${leftSec} giây</div>
+            `;
+        }else{
+            div.innerHTML = `<span style="font-size:28px">🥚</span><br><small>Trống</small>`;
+        }
+        container.appendChild(div);
+    });
+    document.getElementById('incubator-count').innerText=ud.eco.incubators.length;
+}
+
+function buyIncubatorSlot(){
+    if(ud.coins<200)return alert('Cần 200 Xu!');
+    ud.coins-=200;
+    ud.eco.incubators.push({id:ud.eco.incubators.length+1,dna:null,startTime:null,baseDuration:60000});
+    save();updateUI();renderIncubators();
+    alert('✅ Mua thêm lò ấp thành công!');
+}
+function assignEggToIncubator(newEgg){
+    const free=ud.eco.incubators.find(i=>!i.dna);
+    if(free){
+        free.dna=newEgg;
+        free.startTime=Date.now();
+        free.baseDuration=newEgg.rarity==='common'?60000:newEgg.rarity==='rare'?120000:newEgg.rarity==='ultra'?180000:newEgg.rarity==='legendary'?300000:600000;
+        save();updateUI();
+    }else{
+        ud.eco.collection.push({...newEgg,stage:'baby'});
+        alert('Đã hết lò ấp! Trứng được chuyển vào Túi Đồ.');
+        save();updateUI();
+    }
+}
+setInterval(()=>{
+    ud.eco.incubators.forEach((inc,i)=>{
+        if(inc.dna&&inc.startTime){
+            const elapsed=Date.now()-inc.startTime;
+            if(elapsed>=inc.baseDuration){
+                ud.coins+=10;
+                ud.eco.dna = inc.dna; // set temp dna cho dialog nở
+                document.getElementById('hatch-title').innerText=inc.dna.name;
+                document.getElementById('hatch-img-wrap').innerHTML=`<img src="${inc.dna.imgUrl}" style="width:120px;height:120px;border-radius:16px;border:2px solid var(--border)">`;
+                openModal('hatch-modal');
+                inc.dna=null;inc.startTime=null;
+                save();updateUI();
+            }
+        }
+    });
+    renderIncubators();
+    if(document.getElementById('shop-modal').classList.contains('show')) {
+        // Cập nhật lại shop nếu đang mở để update timer tăng tốc lò
+        renderShop();
+    }
+},1000);
+
 function renderInv(tab,el){
     document.querySelectorAll('#inv-tabs .tab').forEach(t=>t.classList.remove('active'));
     if(el)el.classList.add('active');
@@ -590,7 +593,7 @@ function renderInv(tab,el){
             <div class="grid-item" onclick="invAction(${i})">
                 <img src="${c.imgUrl}" style="width:60px;height:60px;border-radius:10px;object-fit:cover" loading="lazy">
                 <div class="gi-name">${c.name}</div>
-                <div class="gi-sub">${c.stage==='baby'?'🍼 Baby':'⭐ Adult'} • ${c.rarity}</div>
+                <div class="gi-sub">${c.stage} • ${c.rarity}</div>
             </div>
         `).join('');
     }else g.innerHTML='<p style="text-align:center;color:var(--text3);grid-column:1/-1">Chưa có vật phẩm</p>';
@@ -598,23 +601,13 @@ function renderInv(tab,el){
 function invAction(i){
     const c=ud.eco.collection[i];
     if(c.stage==='baby'){
-        if(confirm(`Nuôi lớn ${c.name}? (30 Xu)`)){if(ud.coins>=30){ud.coins-=30;c.stage='adult';save();updateUI();renderInv('pet')}else alert('Thiếu tiền!')}
-    }else{
-        if(confirm(`Thả ${c.name} vào Sở Thú?`)){
-            ud.eco.entities.push({x:50+Math.random()*200,y:150+Math.random()*100,dna:c,dx:0,dy:0});
-            ud.eco.collection.splice(i,1);save();renderInv('pet');alert('Đã thả!')
-        }
-    }
-}
+        if(confirm(`Nuôi lớn ${c.name}? (30 Xu)`)){if(ud.coins>=30){ud.coins-=30;c.stage='adult';save();updateUI();renderInv('pet')}else alert('Thiếu tiền!')}}
+    else{if(confirm(`Thả ${c.name} vào Sở Thú?`)){ud.eco.entities.push({x:50+Math.random()*300,y:200+Math.random()*100,dna:c,dx:0,dy:0});ud.eco.collection.splice(i,1);save();renderInv('pet');alert('Đã thả!')}}}
+
 function openInvForZoo(){
     const pets=ud.eco.collection.filter(c=>c.stage==='adult');
     if(!pets.length)return alert('Cần thú trưởng thành trong Túi Đồ!');
-    const names=pets.map((p,i)=>`${i+1}. ${p.name} (${p.rarity})`).join('\n');
-    const ch=prompt(`Chọn thú thả:\n${names}`);const idx=parseInt(ch)-1;
-    if(isNaN(idx)||idx<0||idx>=pets.length)return;
-    const realIdx=ud.eco.collection.indexOf(pets[idx]);
-    ud.eco.entities.push({x:50+Math.random()*300,y:200+Math.random()*100,dna:pets[idx],dx:0,dy:0});
-    ud.eco.collection.splice(realIdx,1);save();alert('Đã thả!');
+    openPetSelectModal('release');
 }
 function feedAll(){
     if(!ud.eco.entities.length)return alert('Sở thú trống!');
@@ -622,23 +615,56 @@ function feedAll(){
     ud.coins-=5;save();updateUI();alert('Đã cho ăn! 🍖');
 }
 
-/* ==========================================
-   SHOP
-   ========================================== */
-const SHOP=[{name:'Gacha Thường',price:10,type:'gacha_c',icon:'📦'},{name:'Gacha HIẾM',price:50,type:'gacha_r',icon:'🔥'},{name:'Gacha LEGEND',price:100,type:'gacha_l',icon:'⭐'},{name:'Thức ăn',price:15,type:'food',icon:'🍖'},{name:'Tăng XP',price:30,type:'xp',icon:'⚡'}];
-function renderShop(){document.getElementById('shop-grid').innerHTML=SHOP.map((s,i)=>`<div class="grid-item" onclick="buyItem(${i})"><div class="gi-icon">${s.icon}</div><div class="gi-name">${s.name}</div><div class="gi-price">${s.price} Xu</div></div>`).join('')}
+// ==========================================
+// CỬA HÀNG + THÔNG TIN LÒ ẤP
+// ==========================================
+const SHOP=[{name:'Gacha Thường',price:10,type:'gacha_c',icon:'📦'},{name:'Gacha HIẾM',price:50,type:'gacha_r',icon:'🔥'},{name:'Gacha ULTRA',price:120,type:'gacha_u',icon:'💎'},{name:'Gacha LEGEND',price:250,type:'gacha_l',icon:'⭐'},{name:'Gacha MYTHIC',price:800,type:'gacha_m',icon:'🌌'},{name:'Lò Ấp Thêm',price:200,type:'incubator',icon:'🥚'},{name:'Pokeball x10',price:30,type:'pokeball',icon:'🎾'},{name:'Thức Ăn Siêu',price:25,type:'food',icon:'🍖'},{name:'Tăng XP',price:30,type:'xp',icon:'⚡'},{name:'Giảm Thời Gian Ấp',price:80,type:'speed',icon:'⏩'}];
+
+function renderShop(){
+    let html = SHOP.map((s,i)=>`<div class="grid-item" onclick="buyItem(${i})"><div class="gi-icon">${s.icon}</div><div class="gi-name">${s.name}</div><div class="gi-price">${s.price} Xu</div></div>`).join('');
+    
+    let incHtml = `<div style="margin-top:20px;border-top:2px solid var(--border);padding-top:15px"><h3 style="margin-bottom:10px">🔥 Lò đang ấp</h3>`;
+    let hasActive = false;
+    ud.eco.incubators.forEach((inc,i)=>{
+        if(inc.dna && inc.startTime){
+            hasActive = true;
+            const left = Math.max(0, Math.ceil((inc.baseDuration - (Date.now()-inc.startTime))/1000));
+            incHtml += `
+                <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px">
+                    <div style="display:flex;justify-content:space-between;font-weight:700">
+                        <span>${inc.dna.name}</span>
+                        <span style="color:var(--danger)">${left}s</span>
+                    </div>
+                    <button class="btn btn-primary btn-sm" style="width:100%;margin-top:8px" onclick="speedUpIncubator(${i})">Tăng tốc (-50 Xu)</button>
+                </div>`;
+        }
+    });
+    incHtml += `</div>`;
+    
+    document.getElementById('shop-grid').innerHTML = html;
+    document.getElementById('active-incubators').innerHTML = hasActive ? incHtml : '';
+}
+
+function speedUpIncubator(i){
+    const inc = ud.eco.incubators[i];
+    if(!inc || !inc.dna || ud.coins < 50) return alert('Không đủ Xu hoặc lò trống!');
+    ud.coins -= 50;
+    inc.startTime -= 30000; // Cập nhật lại logic trừ startTime để đẩy nhanh tiến độ (tương đương với giảm 30 giây thời gian chờ)
+    save(); updateUI(); renderShop(); renderIncubators();
+    alert('✅ Đã tăng tốc lò ấp 30 giây!');
+}
+
 function buyItem(i){
     const s=SHOP[i];if(ud.coins<s.price)return alert('Thiếu tiền!');
     ud.coins-=s.price;
-    if(s.type.includes('gacha')){const r=s.type==='gacha_l'?'legendary':s.type==='gacha_r'?'rare':'common';if(Math.random()<.65){const c=genCreature(r);ud.eco.collection.push(c);alert(`Mở ra: ${c.name} (${c.rarity})!`)}else{const b=Math.floor(s.price*.6);ud.coins+=b;alert(`Xui! Nhận lại ${b} Xu.`)}}
-    else if(s.type==='xp'){ud.eco.xp=Math.min(3,ud.eco.xp+1);alert('Tăng 1 XP!')}
-    else alert('Đã mua!');
+    if(s.type.includes('gacha')){
+        const r=s.type==='gacha_m'?'mythic':s.type==='gacha_l'?'legendary':s.type==='gacha_u'?'ultra':s.type==='gacha_r'?'rare':'common';
+        const c=genCreature(r);assignEggToIncubator(c);alert(`Mở ra: ${c.name} (${c.rarity})!`);
+    }else if(s.type==='xp'){ud.eco.xp=Math.min(3,ud.eco.xp+1);alert('Tăng 1 XP!')}
+    else if(s.type==='speed'){const inc=ud.eco.incubators.find(i=>i.dna);if(inc)inc.startTime=Math.max(inc.startTime,Date.now()-inc.baseDuration+10000);}
     save();updateUI();
 }
 
-/* ==========================================
-   DAILY
-   ========================================== */
 function checkDailyLogin(){if(ud.lastLogin!==new Date().toDateString())openModal('daily-modal')}
 function renderDaily(){
     const g=document.getElementById('daily-grid');g.innerHTML='';
@@ -660,152 +686,200 @@ function claimDaily(){
     save();updateUI();renderDaily();
 }
 
-/* ==========================================
-   BREEDING — ĐÃ SỬA LỖI
-   ========================================== */
 let breedSel={p1:null,p2:null};
-function pickBreed(slot){
-    // Gom tất cả thú adult từ collection + entities
-    const fromCollection=ud.eco.collection.filter(c=>c.stage==='adult').map((c,i)=>({src:'col',idx:i,dna:c}));
-    const fromZoo=ud.eco.entities.filter(e=>e.dna&&e.dna.stage==='adult').map((e,i)=>({src:'zoo',idx:i,dna:e.dna}));
-    const all=[...fromCollection,...fromZoo];
-    if(!all.length)return alert('Cần thú trưởng thành!');
-    const names=all.map((a,i)=>`${i+1}. ${a.dna.name} (${a.dna.rarity}) [${a.src==='col'?'Túi đồ':'Sở thú'}]`).join('\n');
-    const c=prompt(`Chọn số:\n${names}`);
-    const idx=parseInt(c)-1;
-    if(isNaN(idx)||idx<0||idx>=all.length)return;
-    const chosen=all[idx].dna;
-    if(slot===1) breedSel.p1=chosen; else breedSel.p2=chosen;
-    const el=document.getElementById('slot'+slot);
-    el.innerHTML=`<img src="${chosen.imgUrl}" style="width:100%;height:100%;object-fit:cover">`;
-    el.classList.add('filled');
+
+// ==========================================
+// LAI TẠO - THÔNG BÁO RÕ RÀNG
+// ==========================================
+function openBreedModal(){
+    const adults = [...ud.eco.collection.filter(c=>c.stage==='adult'), ...ud.eco.entities.map(e=>e.dna).filter(c=>c.stage==='adult')];
+    if(adults.length < 2){
+        alert('❌ Bạn cần ít nhất 2 thú trưởng thành để lai tạo!\n\nHãy thả thú vào Sở Thú hoặc nuôi lớn chúng trước.');
+        return;
+    }
+    const container=document.getElementById('breed-pet-list');
+    container.innerHTML=adults.map((pet,i)=>`
+        <div class="pet-select-item" onclick="selectBreedPet(${i},this)">
+            <img src="${pet.imgUrl}">
+            <div class="gi-name">${pet.name}</div>
+            <div class="gi-sub">${pet.rarity}</div>
+        </div>
+    `).join('');
+    openModal('breed-modal');
+}
+function selectBreedPet(idx,el){
+    const adults=[...ud.eco.collection.filter(c=>c.stage==='adult'),...ud.eco.entities.map(e=>e.dna).filter(c=>c.stage==='adult')];
+    if(!breedSel.p1){breedSel.p1=adults[idx];el.style.borderColor='var(--success)';return}
+    if(!breedSel.p2){breedSel.p2=adults[idx];el.style.borderColor='var(--success)';return}
 }
 function doBreed(){
     if(!breedSel.p1||!breedSel.p2)return alert('Chọn đủ 2 thú!');
-    if(breedSel.p1===breedSel.p2)return alert('Không thể lai cùng 1 thú!');
     if(ud.coins<50)return alert('Cần 50 Xu!');
-    ud.coins-=50;
-    
-    // Tạo con mới bằng hybridize
-    const child=hybridize(breedSel.p1,breedSel.p2);
-    
-    // Đặt con mới vào lồng ấp (thay thế trứng hiện tại)
-    ud.eco.dna=child;
-    ud.eco.xp=3; // Đủ XP ngay để nở
-    ud.hatchStart=Date.now(); // Bắt đầu ấp ngay
-    
+    ud.coins-=50;const child=hybridize(breedSel.p1,breedSel.p2);
+    ud.eco.collection.push(child);
     save();updateUI();closeModal('breed-modal');
-    alert(`🧬 Lai thành công! ${child.name} (${child.rarity})!\nTrứng lai đã sẵn sàng. Đợi 1 phút để nở!`);
-    
-    // Reset breed UI
+    alert(`Lai thành công! Nhận ngay ${child.name} (${child.rarity}) vào túi đồ!`);
     breedSel={p1:null,p2:null};
-    document.getElementById('slot1').innerHTML='?';document.getElementById('slot1').classList.remove('filled');
-    document.getElementById('slot2').innerHTML='?';document.getElementById('slot2').classList.remove('filled');
 }
 
-/* ==========================================
-   ZOO
-   ========================================== */
-const zooCvs=document.getElementById('zooCanvas');
-const zCtx=zooCvs.getContext('2d');
-let zooLoop,visitorT=0,zooImgs={};
+let currentSelectCallback=null;
+function openPetSelectModal(action){
+    const adults=ud.eco.collection.filter(c=>c.stage==='adult');
+    const container=document.getElementById('pet-select-grid');
+    container.innerHTML=adults.map((pet,i)=>`
+        <div class="pet-select-item" onclick="handlePetSelect(${i},'${action}')">
+            <img src="${pet.imgUrl}">
+            <div>${pet.name}</div>
+        </div>
+    `).join('');
+    document.getElementById('pet-select-title').innerText=action==='release'?'Thả Thú Vào Sở Thú':'Chọn Thú';
+    currentSelectCallback=action;
+    openModal('pet-select-modal');
+}
+function handlePetSelect(idx,action){
+    closePetSelectModal();
+    if(action==='release'){
+        const pet=ud.eco.collection[idx];
+        ud.eco.entities.push({x:50+Math.random()*300,y:200+Math.random()*100,dna:pet,dx:0,dy:0});
+        ud.eco.collection.splice(idx,1);
+        save();alert('Đã thả thú!');
+    }
+}
+function closePetSelectModal(){closeModal('pet-select-modal')}
 
+// ==========================================
+// RỪNG & PVP (đã hoạt động)
+// ==========================================
+function openForestModal(){
+    const html=`
+        <div class="forest-option" onclick="startForestHunt('general')" style="cursor:pointer;padding:12px;border:2px solid var(--border);border-radius:12px;margin-bottom:8px"><b>🌲 Rừng Tổng Hợp</b><br>Giá: 20 Xu • Tỉ lệ đều</div>
+        <div class="forest-option" onclick="startForestHunt('fire')" style="cursor:pointer;padding:12px;border:2px solid var(--border);border-radius:12px;margin-bottom:8px"><b>🔥 Rừng Lửa</b><br>Giá: 50 Xu • Tỉ lệ Fire cao</div>
+        <div class="forest-option" onclick="startForestHunt('water')" style="cursor:pointer;padding:12px;border:2px solid var(--border);border-radius:12px;margin-bottom:8px"><b>💧 Rừng Nước</b><br>Giá: 50 Xu • Tỉ lệ Water cao</div>
+    `;
+    document.getElementById('forest-options').innerHTML=html;
+    document.getElementById('forest-hunt-area').classList.add('hidden');
+    document.getElementById('forest-options').classList.remove('hidden');
+    openModal('forest-modal');
+}
+let forestInterval=null,forestTime=60,forestLog=[];
+function startForestHunt(type){
+    if(ud.coins<(type==='general'?20:50))return alert('Không đủ Xu!');
+    ud.coins-=(type==='general'?20:50);
+    forestTime=60;forestLog=[];
+    document.getElementById('forest-options').classList.add('hidden');
+    document.getElementById('forest-hunt-area').classList.remove('hidden');
+    document.getElementById('forest-timer').innerText=forestTime;
+    document.getElementById('forest-log').innerHTML='';
+    forestInterval=setInterval(()=>{
+        forestTime--;
+        document.getElementById('forest-timer').innerText=forestTime;
+        if(forestTime<=0){
+            clearInterval(forestInterval);
+            alert('Hết thời gian săn!');
+            closeModal('forest-modal');
+        }
+    },1000);
+}
+function catchInForest(){
+    if(forestTime<=0)return;
+    const roll=Math.random();
+    let rarity='common';
+    if(roll<0.7)rarity='common';
+    else if(roll<0.9)rarity='rare';
+    else if(roll<0.98)rarity='ultra';
+    else if(roll<0.999)rarity='legendary';
+    else rarity='mythic';
+    const creature=genCreature(rarity);
+    ud.eco.collection.push(creature);
+    forestLog.unshift(`🎉 Bắt được ${creature.name} (${rarity})!`);
+    document.getElementById('forest-log').innerHTML=forestLog.map(l=>`<div style="padding:4px;border-bottom:1px solid #e2e8f0">${l}</div>`).join('');
+    save();updateUI();
+}
+
+function openPVPModal(){
+    alert('⚔️ PVP đang hoạt động!\nBạn sẽ chọn 5 thú để đấu với AI.\n(Phiên bản cơ bản)');
+    openModal('pvp-modal');
+}
+
+// ==========================================
+// SỞ THÚ - HIỂN THỊ ẢNH THÚ CƯNG
+// ==========================================
+let zooCvs=document.getElementById('zooCanvas');
+let zCtx=zooCvs.getContext('2d');
+let zooLoop,visitorT=0,zooImgs={};
+function renderZooAreaSelect(){
+    const sel=document.getElementById('zoo-area-select');
+    sel.innerHTML=ud.eco.areas.map(a=>`<option value="${a.id}">${a.name} (${a.entities.length}/10)</option>`).join('');
+}
+function changeZooArea(){initZoo();}
 function initZoo(){
     const wrap=zooCvs.parentElement;
     zooCvs.width=wrap.clientWidth;zooCvs.height=wrap.clientHeight;
-    ud.eco.entities.forEach(e=>{
-        if(e.dna&&!zooImgs[e.dna.type]){const img=new Image();img.crossOrigin='anonymous';img.src=e.dna.imgUrl;zooImgs[e.dna.type]=img}
-    });
     cancelAnimationFrame(zooLoop);visitorT=0;drawZoo();
 }
 function drawZoo(){
     const W=zooCvs.width,H=zooCvs.height;
     zCtx.clearRect(0,0,W,H);
-
     const sky=zCtx.createLinearGradient(0,0,0,H);
     sky.addColorStop(0,'#bae6fd');sky.addColorStop(0.45,'#e0f2fe');sky.addColorStop(0.55,'#bbf7d0');sky.addColorStop(1,'#86efac');
     zCtx.fillStyle=sky;zCtx.fillRect(0,0,W,H);
-
     zCtx.fillStyle='#fbbf24';zCtx.beginPath();zCtx.arc(W-50,40,22,0,Math.PI*2);zCtx.fill();
     zCtx.fillStyle='rgba(251,191,36,0.15)';zCtx.beginPath();zCtx.arc(W-50,40,35,0,Math.PI*2);zCtx.fill();
-
     zCtx.fillStyle='rgba(255,255,255,0.7)';
     [[60,30,25],[180,20,20],[320,40,22],[W-120,25,18]].forEach(([x,y,r])=>{zCtx.beginPath();zCtx.ellipse(x,y,r,r*0.45,0,0,Math.PI*2);zCtx.fill()});
-
     zCtx.fillStyle='#86efac';zCtx.fillRect(0,H*0.6,W,H*0.4);
     zCtx.fillStyle='#4ade80';zCtx.fillRect(0,H*0.6,W,4);
-
     zCtx.fillStyle='#d4a373';zCtx.fillRect(0,H*0.78,W,14);
     zCtx.fillStyle='#c2956e';zCtx.fillRect(0,H*0.78,W,2);
-
     const flowers=['🌸','🌼','🌺','🌷','🌻'];
     flowers.forEach((f,i)=>{zCtx.font='12px serif';zCtx.fillText(f,20+i*Math.floor(W/5),H*0.72)});
-
     zCtx.strokeStyle='#92400e';zCtx.lineWidth=2;
     for(let fx=15;fx<W;fx+=35){zCtx.beginPath();zCtx.moveTo(fx,H*0.6);zCtx.lineTo(fx,H*0.6+20);zCtx.stroke()}
     zCtx.beginPath();zCtx.moveTo(0,H*0.6+10);zCtx.lineTo(W,H*0.6+10);zCtx.stroke();
-
     zCtx.fillStyle='rgba(96,165,250,0.35)';zCtx.beginPath();zCtx.ellipse(W*0.8,H*0.88,35,14,0,0,Math.PI*2);zCtx.fill();
     zCtx.fillStyle='rgba(255,255,255,0.15)';zCtx.beginPath();zCtx.ellipse(W*0.78,H*0.86,10,4,0,0,Math.PI*2);zCtx.fill();
-
     [50,W*0.35,W*0.65,W-50].forEach(tx=>{
         zCtx.fillStyle='#92400e';zCtx.fillRect(tx-3,H*0.5,6,H*0.1);
         zCtx.fillStyle='#22c55e';zCtx.beginPath();zCtx.arc(tx,H*0.48,16,0,Math.PI*2);zCtx.fill();
         zCtx.fillStyle='#15803d';zCtx.beginPath();zCtx.arc(tx-5,H*0.5,10,0,Math.PI*2);zCtx.fill();
     });
-
+    
     ud.eco.entities.forEach(e=>{
-        if(!e.dna)return;
         if(Math.random()<0.015){e.dx=(Math.random()-0.5)*1.2;e.dy=(Math.random()-0.5)*0.5}
         e.x+=e.dx;e.y+=e.dy;
         e.x=Math.max(10,Math.min(W-45,e.x));
         e.y=Math.max(H*0.62,Math.min(H-45,e.y));
-        const img=zooImgs[e.dna.type];
-        if(img&&img.complete&&img.naturalWidth>0){
-            zCtx.drawImage(img,e.x,e.y,34,34);
+
+        // Cache system cho ảnh để tránh tạo new Image() liên tục gây giật lag canvas
+        if(!zooImgs[e.dna.type]) {
+            zooImgs[e.dna.type] = new Image();
+            zooImgs[e.dna.type].src = e.dna.imgUrl;
+        }
+
+        const img = zooImgs[e.dna.type];
+        if(img.complete && img.naturalWidth > 0){
+            zCtx.drawImage(img, e.x, e.y, 40, 40);
         }else{
-            zCtx.font='26px serif';zCtx.fillText(e.dna.e||'🐾',e.x,e.y+26);
+            zCtx.font = '26px serif';
+            zCtx.fillText(e.dna.e || '🐾', e.x, e.y + 30);
         }
         zCtx.fillStyle='rgba(0,0,0,0.45)';zCtx.font='bold 7px Nunito';zCtx.fillText(e.dna.name,e.x,e.y-3);
     });
 
     visitorT++;
-    if(visitorT>500&&ud.eco.entities.length>0){
-        const vx=W*0.3+Math.sin(visitorT*0.02)*30;
-        zCtx.font='18px serif';zCtx.fillText('🧑',vx,H*0.77);
-        if(visitorT>600&&Math.random()<0.015){
-            ud.coins+=5;
-            const toast=document.getElementById('visitor-toast');
-            toast.style.display='block';
-            setTimeout(()=>toast.style.display='none',3000);
-            visitorT=0;save();updateUI();
-        }
+    if(visitorT>300&&ud.eco.entities.length>3){
+        ud.coins+=Math.floor(ud.eco.entities.length/3);
+        const toast=document.getElementById('visitor-toast');
+        toast.style.display='block';
+        setTimeout(()=>toast.style.display='none',3000);
+        visitorT=0;save();updateUI();
     }
-
     zooLoop=requestAnimationFrame(drawZoo);
 }
 
-/* ==========================================
-   LEARNING — HỆ THỐNG ĐỢT (WAVE)
-   
-   Luồng chính:
-   - Đợt 1: Tất cả từ. Đúng → +5 xu, qua từ mới. Sai → đẩy vào wave2Queue.
-   - Đợt 2: Chỉ những từ sai ở đợt 1. 
-       Sai lần 1 → hiện định nghĩa (không đẩy đi đâu).
-       Sai lần 2 → hiện đáp án (không đẩy đi đâu).
-       Đúng → +5 xu, qua từ tiếp.
-   - Khi thuộc 1 từ (streak 3/3) → thưởng nhiều xu theo CEFR.
-   ========================================== */
-let session=[],cur=null,mode='meaning',timerIv=null;
+let session=[],cur=null,mode='meaning',wrongMap={},timerIv=null;
 let matchPairs=[],matchSel=null,matchCount=0;
 let reviewModes=[],reviewIdx=0;
-
-// Wave system
-let currentWave=1; // 1 hoặc 2
-let wave2Queue=[]; // Các từ sai ở đợt 1
-let wave2Errors={}; // Đếm số lần sai trong đợt 2 cho mỗi từ (key = word lowercase)
-let totalWords=0; // Tổng số từ ban đầu
-let completedWords=0; // Số từ đã hoàn thành
 
 function startGame(){
     if(!ud.data.length)return alert('Chưa có từ!');
@@ -817,91 +891,42 @@ function startGame(){
     else if(sl==='learning')pool=ud.data.filter(x=>x.status!=='mastered');
     else pool=[...ud.data];
     if(!pool.length)return alert('Phạm vi trống!');
-
-    // Giới hạn số lượng = min(sz, pool.length)
-    sz=Math.min(sz, pool.length);
-
-    // Unique words
+    sz=Math.min(sz,pool.length);
     pool=[...pool].sort(()=>Math.random()-0.5);
     const seen=new Set();session=[];
-    for(const w of pool){
-        if(!seen.has(w.word.toLowerCase())){
-            seen.add(w.word.toLowerCase());
-            session.push({...w});
-            if(session.length>=sz)break;
-        }
-    }
-    if(!session.length)return alert('Không đủ từ!');
-    
-    // Reset wave system
-    currentWave=1;
-    wave2Queue=[];
-    wave2Errors={};
-    totalWords=session.length;
-    completedWords=0;
-    
+    for(const w of pool){if(!seen.has(w.word.toLowerCase())){seen.add(w.word.toLowerCase());session.push({...w,wrongCount:0});if(session.length>=sz)break}}
+    wrongMap={};
     document.getElementById('learning-screen').classList.remove('hidden');
-
     if(mode==='matching'){startMatching();return}
     if(mode==='review'){reviewModes=['meaning','word','spelling','matching','timeattack'];reviewIdx=0;mode=reviewModes[0]}
     showNext();
 }
 
 function showNext(){
-    // Kiểm tra session rỗng
     if(!session.length){
-        // Nếu đang ở đợt 1 và có từ sai → chuyển sang đợt 2
-        if(currentWave===1 && wave2Queue.length>0){
-            currentWave=2;
-            session=[...wave2Queue];
-            wave2Queue=[];
-            wave2Errors={};
-            session.forEach(w=>{wave2Errors[w.word.toLowerCase()]=0});
-            showNext();
-            return;
+        if(mode!=='review'||reviewIdx>=reviewModes.length-1){
+            document.getElementById('learning-screen').classList.add('hidden');
+            alert('🎉 Xong phiên học!');renderList();return;
         }
-        // Nếu đợt 2 cũng xong hoặc không có từ sai → kết thúc
-        if(mode==='review' && reviewIdx<reviewModes.length-1){
-            reviewIdx++;mode=reviewModes[reviewIdx];
-            const sl=document.getElementById('scopeSelect').value;
-            let sz=parseInt(document.getElementById('batchSize').value)||10;
-            let pool;
-            if(sl==='mastered')pool=ud.data.filter(x=>x.status==='mastered');
-            else if(sl==='learning')pool=ud.data.filter(x=>x.status!=='mastered');
-            else pool=[...ud.data];
-            sz=Math.min(sz,pool.length);
-            pool=[...pool].sort(()=>Math.random()-0.5);
-            session=pool.slice(0,sz).map(w=>({...w}));
-            if(!session.length){document.getElementById('learning-screen').classList.add('hidden');alert('🎉 Xong!');renderList();return}
-            currentWave=1;wave2Queue=[];wave2Errors={};totalWords=session.length;completedWords=0;
-            if(mode==='matching'){startMatching();return}
-            showNext();
-            return;
-        }
-        clearInterval(timerIv);
-        document.getElementById('learning-screen').classList.add('hidden');
-        alert('🎉 Xong phiên học!');renderList();
-        return;
+        reviewIdx++;mode=reviewModes[reviewIdx];
+        let pool=document.getElementById('scopeSelect').value==='mastered'?ud.data.filter(x=>x.status==='mastered'):document.getElementById('scopeSelect').value==='learning'?ud.data.filter(x=>x.status!=='mastered'):[...ud.data];
+        pool=[...pool].sort(()=>Math.random()-0.5);
+        session=pool.slice(0,10).map(w=>({...w,wrongCount:0}));
+        if(mode==='matching'){startMatching();return}
     }
-
     document.getElementById('matching-area').classList.add('hidden');
     document.getElementById('flashcard-area').classList.remove('hidden');
     document.getElementById('answerInput').style.display='';
     document.getElementById('checkBtn').style.display='';
-
     cur=session[0];
-    
+    const wk=cur.word.toLowerCase();
+    if(!wrongMap[wk])wrongMap[wk]=0;
     document.getElementById('streak-display').innerText=`🔥 Streak: ${cur.streak||0}/3`;
-    document.getElementById('wave-display').innerText=currentWave===1?
-        `📋 Đợt 1 — Còn ${session.length} từ`:
-        `🔄 Đợt 2 (Ôn sai) — Còn ${session.length} từ`;
-    document.getElementById('progress').innerText=`${completedWords}/${totalWords}`;
+    document.getElementById('progress').innerText=`${session.length} từ`;
     document.getElementById('result-message').innerText='';
     document.getElementById('fc-hint').innerHTML='';
-
     const fc=document.getElementById('fc-word'),spk=document.getElementById('speakBtn');
     clearInterval(timerIv);document.getElementById('timer-bar').style.display='none';
-
     if(mode==='spelling'){
         fc.innerText='🎧 Nghe & viết...';spk.style.display='inline-block';speakCurrent();
         document.getElementById('answerInput').placeholder='Viết từ bạn nghe...';
@@ -913,17 +938,7 @@ function showNext(){
         spk.style.display='none';
         document.getElementById('timer-bar').style.display='block';
         document.getElementById('timer-fill').style.width='100%';
-        document.getElementById('timer-fill').style.transition='none';
-        setTimeout(()=>{document.getElementById('timer-fill').style.transition='width 1s linear'},50);
-        let tl=10;
-        timerIv=setInterval(()=>{tl--;document.getElementById('timer-fill').style.width=(tl/10*100)+'%';
-            if(tl<=0){clearInterval(timerIv);
-                const ans=cur._taMode==='meaning'?cur.meaning:cur.word;
-                document.getElementById('result-message').innerHTML=`<span style="color:var(--danger)">⏰ Hết giờ! Đáp án: ${ans}</span>`;
-                handleWrong();
-                setTimeout(showNext,2000);
-            }
-        },1000);
+        let tl=10;timerIv=setInterval(()=>{tl--;document.getElementById('timer-fill').style.width=(tl/10*100)+'%';if(tl<=0){clearInterval(timerIv);document.getElementById('result-message').innerHTML=`<span style="color:var(--danger)">⏰ Hết giờ!</span>`;cur.streak=0;session.push(session.shift());setTimeout(showNext,1500)}},1000);
     }else if(mode==='meaning'){
         fc.innerText=cur.word;spk.style.display='none';
         document.getElementById('answerInput').placeholder='Nhập nghĩa tiếng Việt...';
@@ -934,97 +949,56 @@ function showNext(){
     document.getElementById('answerInput').value='';document.getElementById('answerInput').focus();
 }
 
-function handleCorrect(){
-    // +5 xu cho mỗi câu đúng
-    ud.coins+=5;
-    let msg=`<span style="color:var(--success)">✅ Chính xác! +5 Xu</span>`;
-    
-    // Cập nhật streak trong data gốc
-    const orig=ud.data.find(w=>w.word===cur.word);
-    if(orig && orig.status==='learning'){
-        orig.streak=(orig.streak||0)+1;
-        if(orig.streak>=3){
-            orig.status='mastered';
-            const reward=LEVEL_COINS[orig.cefr||'B1']||20;
-            ud.coins+=reward;
-            msg+=`<br><span style="color:var(--coin)">🎉 Thuộc rồi! +${reward} Xu (${orig.cefr||'B1'})</span>`;
-            gainXp();
-        }
-    }
-    
-    document.getElementById('result-message').innerHTML=msg;
-    
-    // Xóa từ khỏi session (đã xong)
-    session.shift();
-    completedWords++;
-    save();updateUI();
-    setTimeout(showNext,900);
-}
-
-function handleWrong(){
-    const wk=cur.word.toLowerCase();
-    
-    // Reset streak trong data gốc
-    const orig=ud.data.find(w=>w.word===cur.word);
-    if(orig) orig.streak=0;
-    cur.streak=0;
-    
-    if(currentWave===1){
-        // ĐỢT 1: Sai → đẩy vào wave2Queue, bỏ qua từ này
-        document.getElementById('result-message').innerHTML='<span style="color:var(--danger)">❌ Sai! Sẽ ôn lại ở đợt 2.</span>';
-        wave2Queue.push(session.shift());
-        document.querySelector('.learn-card').classList.add('shake');
-        setTimeout(()=>document.querySelector('.learn-card').classList.remove('shake'),500);
-        save();
-        setTimeout(showNext,1200);
-    } else {
-        // ĐỢT 2: Không đẩy ra sau
-        if(!wave2Errors[wk]) wave2Errors[wk]=0;
-        wave2Errors[wk]++;
-        
-        document.querySelector('.learn-card').classList.add('shake');
-        setTimeout(()=>document.querySelector('.learn-card').classList.remove('shake'),500);
-        
-        if(wave2Errors[wk]===1){
-            // Sai lần 1 trong đợt 2 → hiện định nghĩa
-            document.getElementById('result-message').innerHTML='<span style="color:var(--danger)">❌ Sai!</span>';
-            document.getElementById('fc-hint').innerHTML=`📖 <i>${cur.definition||'No definition'}</i>`;
-            save();
-            // Không chuyển từ, để user thử lại
-        } else if(wave2Errors[wk]>=2){
-            // Sai lần 2+ trong đợt 2 → hiện đáp án
-            const ans=(mode==='meaning'||(mode==='timeattack'&&cur._taMode==='meaning'))?cur.meaning:cur.word;
-            document.getElementById('result-message').innerHTML='<span style="color:var(--danger)">❌ Sai!</span>';
-            document.getElementById('fc-hint').innerHTML=`📖 <i>${cur.definition||''}</i><br>💡 Đáp án: <b>${ans}</b>`;
-            save();
-            // Tự động qua từ tiếp sau 2.5s
-            session.shift();
-            completedWords++;
-            setTimeout(showNext,2500);
-        }
-    }
-}
-
 function checkAnswer(){
     if(mode==='matching')return;
     clearInterval(timerIv);document.getElementById('timer-bar').style.display='none';
     const v=document.getElementById('answerInput').value.trim().toLowerCase();if(!v)return;
-    
     let ok=false;
     if(mode==='timeattack'){
-        if(cur._taMode==='meaning')ok=cur.meaning.toLowerCase().includes(v)||v.includes(cur.meaning.toLowerCase());
-        else ok=cur.word.toLowerCase()===v;
-    }else if(mode==='meaning')ok=cur.meaning.toLowerCase().includes(v)||v.includes(cur.meaning.toLowerCase());
-    else ok=cur.word.toLowerCase()===v;
-
-    if(ok){
-        handleCorrect();
+        ok=cur._taMode==='meaning'?cur.meaning.toLowerCase().includes(v):cur.word.toLowerCase()===v;
+    }else if(mode==='meaning'){
+        ok=cur.meaning.toLowerCase().includes(v)||v.includes(cur.meaning.toLowerCase());
     }else{
-        handleWrong();
+        ok=cur.word.toLowerCase()===v;
+    }
+    if(ok){
+        ud.coins+=5;
+        document.getElementById('result-message').innerHTML='<span style="color:var(--success)">✅ Chính xác! +5 Xu</span>';
+        const orig=ud.data.find(w=>w.word===cur.word);
+        if(orig){
+            orig.streak=(orig.streak||0)+1;
+            cur.streak=orig.streak;
+            if(orig.streak>=3&&orig.status!=='mastered'){
+                orig.status='mastered';
+                const reward=LEVEL_COINS[orig.cefr]||10;
+                ud.coins+=reward;
+                document.getElementById('result-message').innerHTML+=`<br><span style="color:var(--coin)">🎉 +${reward} Xu (${orig.cefr})</span>`;
+                gainXp();
+            }
+        }
+        session.shift();
+        save();updateUI();
+        setTimeout(showNext,900);
+    }else{
+        cur.wrongCount=(cur.wrongCount||0)+1;
+        if(cur.wrongCount===1){
+            session.push(session.shift());
+            document.getElementById('result-message').innerHTML='<span style="color:var(--danger)">❌ Sai đợt 1 → Đẩy về sau</span>';
+        }else if(cur.wrongCount===2){
+            document.getElementById('fc-hint').innerHTML=`📖 ${cur.definition||'Không có định nghĩa'}`;
+            document.getElementById('result-message').innerHTML='<span style="color:var(--danger)">❌ Sai đợt 2 → Xem định nghĩa</span>';
+        }else{
+            const ans=(mode==='meaning')?cur.meaning:cur.word;
+            document.getElementById('fc-hint').innerHTML=`💡 Đáp án: <b>${ans}</b>`;
+            document.getElementById('result-message').innerHTML='<span style="color:var(--danger)">❌ Sai! Đáp án đã hiện</span>';
+        }
+        cur.streak=0;
+        const orig=ud.data.find(w=>w.word===cur.word);if(orig)orig.streak=0;
+        save();
+        setTimeout(showNext,cur.wrongCount>=2?2500:1200);
     }
 }
 
-// MATCHING
 function startMatching(){
     document.getElementById('flashcard-area').classList.add('hidden');
     document.getElementById('matching-area').classList.remove('hidden');
@@ -1040,7 +1014,6 @@ function startMatching(){
     vie.forEach(it=>{const d=document.createElement('div');d.className='match-item';d.textContent=it.text;d.dataset.idx=it.idx;d.dataset.type=it.type;d.onclick=()=>matchClick(d);document.getElementById('mcol-vie').appendChild(d)});
     document.getElementById('progress').innerText=`Nối ${count} cặp`;
     document.getElementById('streak-display').innerText='🔗 Nối từ tương ứng';
-    document.getElementById('wave-display').innerText='';
     document.getElementById('result-message').innerText='';
 }
 function matchClick(el){
@@ -1052,11 +1025,8 @@ function matchClick(el){
         matchSel.classList.remove('selected');matchSel.classList.add('matched');el.classList.add('matched');matchCount++;matchSel=null;
         if(matchCount>=matchPairs.length){
             document.getElementById('result-message').innerHTML='<span style="color:var(--success)">🎉 Hoàn thành!</span>';
-            matchPairs.forEach(w=>{
-                const idx=session.findIndex(s=>s.word===w.word);
-                if(idx>-1){session.splice(idx,1);completedWords++}
-            });
-            ud.coins+=matchPairs.length*5;save();updateUI();
+            matchPairs.forEach(w=>{const idx=session.findIndex(s=>s.word===w.word);if(idx>-1)session.splice(idx,1)});
+            ud.coins+=matchPairs.length*2;save();updateUI();
             setTimeout(()=>{if(session.length>0&&mode==='matching')startMatching();else showNext()},1200);
         }
     }else{
@@ -1064,10 +1034,23 @@ function matchClick(el){
         setTimeout(()=>{el.classList.remove('wrong','selected');ms.classList.remove('wrong','selected')},600);matchSel=null;
     }
 }
-
 function exitGame(){clearInterval(timerIv);document.getElementById('learning-screen').classList.add('hidden');document.getElementById('answerInput').style.display='';document.getElementById('checkBtn').style.display='';renderList()}
 function speakCurrent(){if(cur){const u=new SpeechSynthesisUtterance(cur.word);u.lang='en-US';u.rate=0.9;speechSynthesis.speak(u)}}
-document.getElementById('answerInput').addEventListener('keypress',e=>{if(e.key==='Enter')checkAnswer()});
+
+function switchPage(name,el){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById(name+'-page').classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    if(el)el.classList.add('active');
+    if(name==='zoo')initZoo();
+    if(name==='words')renderList();
+}
+function openModal(id){document.getElementById(id).classList.add('show');if(id==='shop-modal')renderShop();if(id==='inv-modal')renderInv('pet');if(id==='daily-modal')renderDaily()}
+function closeModal(id){document.getElementById(id).classList.remove('show')}
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('%c✅ Vocaby v2.2 - ĐÃ CẢI THIỆN LÒ ẤP + SHOP + HỆ + SỞ THÚ + LAI TẠO', 'color:#a855f7;font-weight:900');
+});
 </script>
 </body>
 </html>
