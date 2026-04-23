@@ -1,13 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌸 Vocaby – Học Từ Vui Vẻ</title>
+    <title>🌸 Vocaby – Ultimate PVP Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Press+Start+2P&display=swap" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
         :root {
             --bg:#fef7ff;--bg2:#fdf2f8;--card:#ffffff;
@@ -42,10 +39,11 @@
         .login-btns{display:flex;gap:10px;margin-top:8px}
         #login-msg{color:var(--danger);font-size:12px;margin-top:12px;font-weight:700}
 
-        .btn{padding:14px 20px;border-radius:14px;font-weight:800;cursor:pointer;border:none;width:100%;font-size:14px;font-family:inherit;transition:all .2s;letter-spacing:.3px}
+        .btn{padding:14px 20px;border-radius:14px;font-weight:800;cursor:pointer;border:none;width:100%;font-size:14px;font-family:inherit;transition:all .2s;letter-spacing:.3px;display:flex;align-items:center;justify-content:center;gap:6px}
         .btn-primary{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;box-shadow:0 4px 15px rgba(168,85,247,0.25)}
         .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(168,85,247,0.3)}
         .btn-primary:active{transform:scale(.97)}
+        .btn-primary:disabled{opacity:0.7;cursor:not-allowed;transform:none;box-shadow:none}
         .btn-outline{background:transparent;border:2px solid var(--border2);color:var(--text2)}
         .btn-outline:hover{border-color:var(--primary);color:var(--primary);background:rgba(168,85,247,0.04)}
         .btn-sm{width:auto;padding:8px 16px;font-size:12px;border-radius:10px}
@@ -79,7 +77,6 @@
         .card{background:var(--card);border-radius:var(--radius);padding:20px;border:1.5px solid var(--border);margin-bottom:16px;box-shadow:var(--shadow-card);transition:.2s}
         .card:hover{box-shadow:var(--shadow)}
         .card-title{font-size:15px;font-weight:800;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:8px}
-        .card-title .emoji{font-size:20px}
 
         .word-list{max-height:55vh;overflow-y:auto}
         .word-item{display:flex;align-items:center;gap:12px;padding:14px;background:var(--bg);margin-bottom:8px;border-radius:14px;border:1.5px solid transparent;transition:.2s}
@@ -94,14 +91,13 @@
         @keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
         .msg-ai{align-self:flex-start;background:var(--card);border:1px solid var(--border);color:var(--text)}
         .msg-user{align-self:flex-end;background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;border-radius:14px 14px 4px 14px}
-        .typing-cursor::after{content:'▋';animation:blink .7s infinite;color:var(--primary)}
-        @keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
 
         #learning-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#fef7ff,#eff6ff);z-index:4000;display:flex;align-items:center;justify-content:center}
         .learn-card{width:92%;max-width:520px;background:var(--card);border-radius:28px;padding:32px;box-shadow:var(--shadow-lg);border:2px solid var(--border);text-align:center;position:relative}
         .learn-card::before{content:'';position:absolute;top:0;left:20%;right:20%;height:3px;background:linear-gradient(90deg,var(--primary),var(--secondary));border-radius:0 0 10px 10px}
         #fc-word{font-size:32px;font-weight:900;color:var(--primary);margin:16px 0 8px}
         #streak-display{color:var(--warning);font-weight:800;font-size:13px}
+        #wave-display{color:var(--accent);font-weight:800;font-size:12px;margin-top:4px}
         #timer-bar{width:100%;height:6px;background:var(--border);border-radius:10px;margin-bottom:20px;overflow:hidden;display:none}
         #timer-fill{width:100%;height:100%;background:linear-gradient(90deg,var(--warning),var(--danger));border-radius:10px;transition:width linear}
         .shake{animation:shake .5s both}
@@ -114,7 +110,7 @@
         .match-item.matched{border-color:var(--success);background:var(--success-light);color:var(--success);opacity:.6;pointer-events:none}
         .match-item.wrong{border-color:var(--danger);background:var(--danger-light);animation:shake .4s}
 
-        .zoo-wrap{position:relative;width:100%;height:52vh;border-radius:var(--radius);overflow:hidden;border:2px solid var(--border);margin-bottom:12px;background:linear-gradient(180deg,#bae6fd 0%,#e0f2fe 40%,#bbf7d0 60%,#86efac 100%)}
+        .zoo-wrap{position:relative;width:100%;height:52vh;border-radius:var(--radius);overflow:hidden;border:2px solid var(--border);margin-bottom:12px;background:linear-gradient(180deg,#bae6fd 0%,#e0f2fe 40%,#bbf7d0 60%,#86efac 100%); cursor: crosshair;}
         .zoo-wrap canvas{display:block;width:100%;height:100%}
         .zoo-hud{position:absolute;top:10px;right:10px;background:rgba(255,255,255,0.85);backdrop-filter:blur(10px);padding:6px 14px;border-radius:10px;font-weight:800;font-size:13px;color:#92400e;border:1.5px solid #fde68a}
         .visitor-toast{position:absolute;top:50px;right:10px;background:rgba(16,185,129,0.9);color:#fff;padding:8px 14px;border-radius:10px;font-size:12px;font-weight:700;animation:toastIn 3s forwards;display:none}
@@ -123,7 +119,7 @@
         .zoo-btn{padding:10px 16px;border-radius:12px;background:var(--card);border:1.5px solid var(--border);font-size:12px;font-weight:700;cursor:pointer;transition:.2s;color:var(--text2);font-family:inherit}
         .zoo-btn:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
 
-        .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);z-index:5000;display:none;align-items:center;justify-content:center}
+        .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:5000;display:none;align-items:center;justify-content:center}
         .modal-overlay.show{display:flex}
         .modal-box{width:92%;max-width:560px;background:var(--card);border-radius:24px;padding:24px;max-height:85vh;overflow-y:auto;box-shadow:var(--shadow-lg);border:2px solid var(--border);animation:modalPop .3s cubic-bezier(.34,1.56,.64,1)}
         @keyframes modalPop{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
@@ -132,57 +128,75 @@
         .modal-close{width:32px;height:32px;border-radius:10px;background:var(--danger-light);color:var(--danger);border:none;cursor:pointer;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;transition:.2s}
         .modal-close:hover{background:#fecdd3}
         .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;max-height:300px;overflow-y:auto}
-        .grid-item{border:1.5px solid var(--border);border-radius:14px;padding:12px 8px;text-align:center;cursor:pointer;background:var(--bg);transition:.2s}
+        .grid-item{border:1.5px solid var(--border);border-radius:14px;padding:12px 8px;text-align:center;cursor:pointer;background:var(--bg);transition:.2s; position:relative;}
         .grid-item:hover{border-color:var(--primary);background:var(--card);transform:translateY(-2px);box-shadow:var(--shadow)}
+        .grid-item.selected {border-color:var(--success); background:var(--success-light);}
         .grid-item img{width:60px;height:60px;border-radius:10px;object-fit:cover;margin-bottom:4px}
         .gi-icon{font-size:36px;margin-bottom:4px}.gi-name{font-size:11px;font-weight:800;margin-bottom:2px}.gi-sub{font-size:10px;color:var(--text3)}.gi-price{font-size:10px;color:#92400e;background:var(--warning-light);padding:2px 8px;border-radius:8px;font-weight:700;display:inline-block;margin-top:4px}
+        
+        .type-badges { display: flex; gap: 4px; justify-content: center; flex-wrap: wrap; margin-top: 4px; }
+        .type-badge { font-size: 9px; padding: 2px 6px; border-radius: 6px; font-weight: 800; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.4); display: flex; align-items: center; gap: 3px; }
+
         .breed-area{display:flex;align-items:center;justify-content:center;gap:16px;margin:20px 0}
         .breed-slot{width:80px;height:80px;border:2px dashed var(--border2);border-radius:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--bg);font-size:28px;color:var(--text3);transition:.2s;overflow:hidden}
         .breed-slot:hover{border-color:var(--primary);color:var(--primary)}
         .breed-slot.filled{border-style:solid;border-color:var(--success)}
-        .breed-slot img{width:100%;height:100%;object-fit:cover}
+        
         .daily-row{display:flex;gap:8px;overflow-x:auto;padding:8px 0}
         .day-box{border:1.5px solid var(--border);border-radius:14px;padding:14px 10px;text-align:center;min-width:62px;background:var(--bg);opacity:.5;transition:.2s;flex-shrink:0}
-        .day-box span{display:block;font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:700}
-        .day-box b{font-size:13px;color:var(--coin)}
         .day-box.active{border-color:var(--warning);background:var(--warning-light);opacity:1;transform:scale(1.08)}
         .day-box.claimed{background:var(--success-light);border-color:var(--success);opacity:1}
+        
         .eco-card{background:linear-gradient(135deg,var(--primary-light),#fce7f3);border-radius:var(--radius);padding:20px;text-align:center;border:1.5px solid var(--border);margin-bottom:16px}
-        .eco-card canvas{image-rendering:pixelated;border-radius:12px;background:rgba(255,255,255,0.5)}
         .hatch-bar{background:var(--border);height:8px;border-radius:10px;margin-top:10px;overflow:hidden}
         .hatch-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,var(--primary),var(--secondary));transition:.4s}
         .anim-egg{animation:wobble 2s infinite ease-in-out}
         @keyframes wobble{0%,100%{transform:rotate(0)}25%{transform:rotate(-5deg)}75%{transform:rotate(5deg)}}
         .sec-label{font-size:11px;font-weight:800;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
+        
         .ai-suggest-btn{background:linear-gradient(135deg,#6366f1,#8b5cf6,#a855f7);color:#fff;padding:16px;border-radius:16px;font-size:15px;font-weight:800;cursor:pointer;border:none;width:100%;box-shadow:0 6px 20px rgba(139,92,246,0.3);transition:.2s;font-family:inherit;margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px}
         .ai-suggest-btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(139,92,246,0.4)}
-        .ai-suggest-btn:active{transform:scale(.97)}
         .tabs{display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;padding:3px;background:var(--bg2);border-radius:14px}
         .tab{padding:9px 16px;cursor:pointer;color:var(--text3);font-weight:700;white-space:nowrap;border-radius:11px;transition:.2s;font-size:13px}
-        .tab:hover{color:var(--text2);background:rgba(168,85,247,0.05)}
         .tab.active{background:var(--card);color:var(--primary);box-shadow:var(--shadow-card)}
-        .incubator-list{display:flex;gap:12px;overflow-x:auto;padding:8px 0}
-        .pet-select-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:12px}
-        .pet-select-item{border:2px solid var(--border);border-radius:16px;padding:8px;text-align:center;cursor:pointer;transition:.2s}
-        .pet-select-item:hover{border-color:var(--primary)}
-        .pet-select-item img{width:80px;height:80px;object-fit:cover;border-radius:12px}
+        
+        .rarity-common { color: #6b7280; font-weight: 700; }
+        .rarity-rare { color: #3b82f6; font-weight: 800; }
+        .rarity-epic { color: #a855f7; font-weight: 900; }
+        .rarity-legendary { color: #f59e0b; font-weight: 900; text-shadow: 0 0 5px rgba(245,158,11,0.5); }
+        .rarity-mythic { color: #ef4444; font-weight: 900; text-shadow: 0 0 8px rgba(239,68,68,0.8); }
 
-        /* --- CSS MỚI --- */
-        .incubator-slot{position:relative;background:var(--bg);border:2px dashed var(--border);border-radius:16px;padding:12px;margin:8px 0;text-align:center;min-width:130px}
-        .incubator-slot.filled{border-style:solid;border-color:var(--primary)}
-        .progress-bar{height:10px;background:#e5e7eb;border-radius:9999px;overflow:hidden;margin:8px 0}
-        .progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--secondary));transition:width .4s}
-        .inc-timer{font-size:14px;font-weight:700;color:var(--danger);text-align:center}
-        .pet-img{width:60px;height:60px;object-fit:cover;border-radius:12px}
+        #global-toast { position:fixed; top:20px; left:50%; transform:translate(-50%,-10px); background:rgba(0,0,0,0.9); color:#fff; padding:12px 24px; border-radius:20px; z-index:9999; font-weight:bold; font-size:14px; transition:0.3s; opacity:0; pointer-events:none; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        select#zoo-area-select { width:auto; padding: 4px 8px; margin: 0 0 0 auto; border: none; background: transparent; font-weight: 800; color: var(--primary); font-size: 14px; cursor: pointer; }
+
+        /* PVP STYLES */
+        .pvp-header { display:flex; justify-content:space-between; align-items:center; background:#1e293b; color:#fff; padding:15px; border-radius:16px; margin-bottom:15px; }
+        .pvp-hp-bar { height:12px; background:#475569; border-radius:10px; overflow:hidden; width:100px; margin-top:6px; border:2px solid #0f172a; }
+        .pvp-hp-fill { height:100%; background:linear-gradient(90deg, #22c55e, #4ade80); transition:0.3s; }
+        .pvp-pet-card { text-align:center; flex:1; }
+        .pvp-pet-card img { width:80px; height:80px; object-fit:cover; border-radius:12px; border:3px solid #334155; background:#0f172a; }
+        .pvp-log { background:#0f172a; color:#cbd5e1; font-family:monospace; font-size:12px; padding:12px; border-radius:12px; height:120px; overflow-y:auto; margin-bottom:15px; border:1px solid #334155; }
+        .pvp-log p { margin:4px 0; border-bottom:1px dashed #334155; padding-bottom:4px; }
+        .log-p { color:#38bdf8; } .log-e { color:#f43f5e; } .log-crit { color:#fbbf24; font-weight:bold; }
+        .pvp-skills { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        .pvp-skill-btn { padding:12px; border-radius:12px; border:none; color:#fff; font-weight:bold; cursor:pointer; text-shadow:0 1px 2px rgba(0,0,0,0.5); font-family:inherit; transition:0.2s; display:flex; flex-direction:column; align-items:center; gap:4px;}
+        .pvp-skill-btn:active { transform:scale(0.95); }
+        .pvp-skill-btn:disabled { filter:grayscale(1); opacity:0.5; cursor:not-allowed; }
+
+        /* Lão hóa / Level */
+        .stat-box { background:var(--bg2); padding:8px; border-radius:10px; font-size:12px; display:flex; justify-content:space-between; margin-top:4px; border:1px solid var(--border); }
+        .stat-val { font-weight:900; color:var(--primary); }
     </style>
 </head>
 <body>
+
+<div id="global-toast">Thông báo</div>
 
 <div id="login-overlay">
     <div class="login-deco">🌸</div>
     <div class="login-box">
         <h1>Vocaby</h1>
-        <p>Học từ vựng • Nuôi thú cưng • Khám phá</p>
+        <p>Học từ vựng • Nuôi thú cưng • Đấu PVP</p>
         <input type="text" id="username" placeholder="👤 Tên đăng nhập">
         <input type="password" id="password" placeholder="🔒 Mật khẩu">
         <div class="login-btns">
@@ -245,13 +259,17 @@
 
     <div id="zoo-page" class="page">
         <div class="eco-card">
-            <div class="sec-label">🥚 LÒ ẤP (<span id="incubator-count">1</span> lò)</div>
-            <div class="incubator-list" id="incubator-list"></div>
-            <button class="btn btn-success btn-sm" style="margin-top:10px" onclick="buyIncubatorSlot()">🛒 Mua thêm lò (200 Xu)</button>
+            <div class="sec-label">🥚 LỒNG ẤP</div>
+            <canvas id="egg-canvas" width="80" height="80" style="width:80px;margin:8px auto;display:block"></canvas>
+            <div id="eco-name" style="font-weight:800;font-size:14px;color:var(--primary-dark);margin-top:6px">Trứng</div>
+            <div class="hatch-bar"><div id="eco-progress" class="hatch-fill" style="width:0%"></div></div>
+            <div id="hatch-timer" style="font-size:11px;color:var(--text2);margin-top:6px">Học <b id="xp-needed">3</b> từ để nở</div>
+            <button class="btn btn-success btn-sm" style="margin-top:10px" onclick="hatchEgg()">🥚 Ấp Trứng</button>
         </div>
         <div class="card">
-            <div class="card-title"><span class="emoji">🦁</span> Sở Thú 
-                <select id="zoo-area-select" onchange="changeZooArea()" style="margin-left:auto;font-size:13px;border:none;background:transparent;font-weight:700;color:var(--primary)"></select>
+            <div class="card-title">
+                <span class="emoji">🦁</span> Sở Thú 
+                <select id="zoo-area-select" onchange="changeZooArea()"></select>
             </div>
             <div class="zoo-wrap">
                 <canvas id="zooCanvas"></canvas>
@@ -259,11 +277,10 @@
                 <div class="visitor-toast" id="visitor-toast">🧑 Khách ghé thăm! +5 Xu</div>
             </div>
             <div class="zoo-controls">
-                <button class="zoo-btn" onclick="openPetSelectModal('release')">🎒 Thả Thú</button>
-                <button class="zoo-btn" onclick="openBreedModal()">🧬 Lai Tạo</button>
-                <button class="zoo-btn" onclick="feedAll()">🍖 Cho Ăn (5xu)</button>
-                <button class="zoo-btn" onclick="openForestModal()">🌲 Đi Rừng Săn</button>
-                <button class="zoo-btn" onclick="openPVPModal()">⚔️ PVP</button>
+                <button class="zoo-btn" onclick="openInvForZoo()">🏕️ Thả Thú</button>
+                <button class="zoo-btn" onclick="openModal('breed-modal')">🧬 Lai Tạo</button>
+                <button class="zoo-btn" style="border-color:var(--danger); color:var(--danger)" onclick="openPVPSetup()">⚔️ PVP 1vs1</button>
+                <button class="zoo-btn" style="margin-left:auto; border-color:var(--success); color:var(--success)" onclick="buyZooArea()">➕ Mở Khu</button>
             </div>
         </div>
     </div>
@@ -280,8 +297,8 @@
     </div>
 
     <div id="more-page" class="page">
-        <div class="card" onclick="openModal('shop-modal')" style="cursor:pointer"><div style="display:flex;align-items:center;gap:14px"><span style="font-size:36px">🛒</span><div><div style="font-weight:800;font-size:15px">Cửa Hàng</div><div style="font-size:12px;color:var(--text2)">Mua trứng, gacha, lò ấp, pokeball...</div></div></div></div>
-        <div class="card" onclick="openModal('inv-modal')" style="cursor:pointer"><div style="display:flex;align-items:center;gap:14px"><span style="font-size:36px">🎒</span><div><div style="font-weight:800;font-size:15px">Túi Đồ</div><div style="font-size:12px;color:var(--text2)">Quản lý thú cưng</div></div></div></div>
+        <div class="card" onclick="openModal('shop-modal')" style="cursor:pointer"><div style="display:flex;align-items:center;gap:14px"><span style="font-size:36px">🛒</span><div><div style="font-weight:800;font-size:15px">Cửa Hàng</div><div style="font-size:12px;color:var(--text2)">Mua trứng, gacha</div></div></div></div>
+        <div class="card" onclick="openModal('inv-modal')" style="cursor:pointer"><div style="display:flex;align-items:center;gap:14px"><span style="font-size:36px">🎒</span><div><div style="font-weight:800;font-size:15px">Túi Đồ & Huấn luyện</div><div style="font-size:12px;color:var(--text2)">Nâng cấp, học chiêu thức</div></div></div></div>
         <div class="card" onclick="openModal('daily-modal')" style="cursor:pointer"><div style="display:flex;align-items:center;gap:14px"><span style="font-size:36px">📅</span><div><div style="font-weight:800;font-size:15px">Điểm Danh</div><div style="font-size:12px;color:var(--text2)">Nhận xu hàng ngày</div></div></div></div>
         <div class="card"><div style="display:flex;align-items:center;gap:14px"><span style="font-size:36px">👤</span><div><div style="font-weight:800;font-size:15px" id="more-username">Khách</div><div style="font-size:12px;color:var(--text2)">Đã thuộc: <b id="more-learned">0</b> từ</div></div></div><button class="btn btn-danger btn-sm" style="margin-top:12px" onclick="logout()">Đăng xuất</button></div>
     </div>
@@ -295,20 +312,121 @@
     <div class="nav-item" onclick="switchPage('more',this)"><span class="nav-icon">☰</span>Thêm</div>
 </div>
 
-<div class="modal-overlay" id="shop-modal">
-    <div class="modal-box">
-        <div class="modal-header"><h3>🛒 Cửa Hàng</h3><button class="modal-close" onclick="closeModal('shop-modal')">✕</button></div>
-        <div class="grid" id="shop-grid"></div>
-        <div id="active-incubators" style="margin-top:20px"></div>
+<div class="modal-overlay" id="shop-modal"><div class="modal-box"><div class="modal-header"><h3>🛒 Cửa Hàng</h3><button class="modal-close" onclick="closeModal('shop-modal')">✕</button></div><div class="grid" id="shop-grid"></div></div></div>
+<div class="modal-overlay" id="inv-modal"><div class="modal-box"><div class="modal-header"><h3>🎒 Túi Đồ</h3><button class="modal-close" onclick="closeModal('inv-modal')">✕</button></div><div class="tabs" id="inv-tabs"><div class="tab active" onclick="renderInv('pet',this)">Thú Cưng</div><div class="tab" onclick="renderInv('item',this)">Vật Phẩm</div></div><div class="grid" id="inv-grid"></div></div></div>
+<div class="modal-overlay" id="daily-modal"><div class="modal-box"><div class="modal-header"><h3>📅 Điểm Danh</h3><button class="modal-close" onclick="closeModal('daily-modal')">✕</button></div><div class="daily-row" id="daily-grid"></div><div style="text-align:center;margin-top:16px"><button id="claim-btn" class="btn btn-primary" onclick="claimDaily()" style="width:180px;margin:0 auto">Nhận Thưởng</button></div></div></div>
+<div class="modal-overlay" id="breed-modal"><div class="modal-box"><div class="modal-header"><h3>🧬 Lai Tạo Đặc Biệt</h3><button class="modal-close" onclick="closeModal('breed-modal')">✕</button></div><p style="text-align:center;font-size:12px;color:var(--text2)">Thú con có thể kế thừa ngẫu nhiên hệ của bố và mẹ để tạo ra Song Hệ (Dual-Type)!</p><div class="breed-area"><div id="slot1" class="breed-slot" onclick="pickBreed(1)">?</div><span style="font-size:24px;color:var(--text3)">✦</span><div id="slot2" class="breed-slot" onclick="pickBreed(2)">?</div></div><button class="btn btn-primary" onclick="doBreed()">🧬 Lai Tạo AI (50 Xu)</button></div></div>
+
+<div class="modal-overlay" id="hatch-modal">
+    <div class="modal-box" style="text-align:center">
+        <h2 style="color:var(--success);margin-bottom:8px">🎉 Trứng Đã Nở!</h2>
+        <div id="hatch-title" style="font-weight:800;font-size:16px;color:var(--primary);margin-bottom:12px"></div>
+        <div id="hatch-img-wrap" style="margin:0 auto 12px"></div>
+        <div id="hatch-types" class="type-badges" style="margin-bottom:12px"></div>
+        <p style="font-weight:700; margin-bottom:10px">+<span id="hatch-reward">10</span> Xu 🪙</p>
+        <button class="btn btn-primary" onclick="keepBaby()">Cất vào Túi</button>
     </div>
 </div>
-<div class="modal-overlay" id="inv-modal"><div class="modal-box"><div class="modal-header"><h3>🎒 Túi Đồ</h3><button class="modal-close" onclick="closeModal('inv-modal')">✕</button></div><div class="tabs" id="inv-tabs"><div class="tab active" onclick="renderInv('pet',this)">Thú Cưng</div><div class="tab" onclick="renderInv('item',this)">Vật Phẩm</div></div><div class="grid" id="inv-grid"></div></div></div>
-<div class="modal-overlay" id="daily-modal"><div class="modal-box"><div class="modal-header"><h3>📅 Điểm Danh</h3><button class="modal-close" onclick="closeModal('daily-modal')">✕</button></div><div class="daily-row" id="daily-grid"></div><div style="text-align:center;margin-top:16px"><button id="claim-btn" class="btn btn-primary" onclick="claimDaily()" style="width:180px">Nhận Thưởng</button><div id="claim-msg" style="color:var(--success);font-weight:700;margin-top:8px"></div></div></div></div>
-<div class="modal-overlay" id="breed-modal"><div class="modal-box"><div class="modal-header"><h3>🧬 Lai Tạo</h3><button class="modal-close" onclick="closeModal('breed-modal')">✕</button></div><p style="text-align:center;font-size:13px;color:var(--text2);margin-bottom:10px">Chọn 2 thú trưởng thành (50 Xu)</p><div id="breed-pet-list" class="pet-select-grid"></div><button class="btn btn-primary" onclick="doBreed()" style="margin-top:16px">Lai Tạo Ngay (50 Xu)</button></div></div>
-<div class="modal-overlay" id="pet-select-modal"><div class="modal-box"><div class="modal-header"><h3 id="pet-select-title">Chọn Thú</h3><button class="modal-close" onclick="closePetSelectModal()">✕</button></div><div id="pet-select-grid" class="pet-select-grid"></div></div></div>
-<div class="modal-overlay" id="forest-modal"><div class="modal-box"><div class="modal-header"><h3>🌲 Đi Rừng Săn Thú</h3><button class="modal-close" onclick="closeModal('forest-modal')">✕</button></div><div id="forest-options"></div><div id="forest-hunt-area" class="hidden"><div style="text-align:center"><div id="forest-timer" style="font-size:24px;font-weight:900;color:var(--danger)">60</div><button class="btn btn-primary" onclick="catchInForest()" style="margin:20px 0">🎾 Ném Pokeball</button><div id="forest-log" style="height:200px;overflow-y:auto;background:#f8fafc;border-radius:12px;padding:10px;font-size:13px"></div></div></div></div></div>
-<div class="modal-overlay" id="pvp-modal"><div class="modal-box"><div class="modal-header"><h3>⚔️ PVP (Chọn 5 thú đấu)</h3><button class="modal-close" onclick="closeModal('pvp-modal')">✕</button></div><p style="text-align:center;color:var(--text2)">Tính năng đang hoàn thiện - sẽ cập nhật sớm</p><button class="btn btn-primary" onclick="closeModal('pvp-modal')">Quay lại</button></div></div>
-<div class="modal-overlay" id="hatch-modal"><div class="modal-box" style="text-align:center"><h2 style="color:var(--success);margin-bottom:8px">🎉 Trứng Đã Nở!</h2><div id="hatch-title" style="font-weight:800;font-size:16px;color:var(--primary);margin-bottom:12px"></div><div id="hatch-img-wrap" style="margin:0 auto 12px"></div><p style="font-weight:700">+<span id="hatch-reward">10</span> Xu 🪙</p><div style="display:flex;gap:10px;margin-top:16px"><button class="btn btn-primary" onclick="growCreature()">Nuôi Lớn (30 Xu)</button><button class="btn btn-outline" onclick="keepBaby()">Cất vào Túi</button></div></div></div>
+
+<div class="modal-overlay" id="pet-select-modal">
+    <div class="modal-box">
+        <div class="modal-header"><h3 id="pet-select-title">Chọn Thú</h3><button class="modal-close" onclick="closeModal('pet-select-modal')">✕</button></div>
+        <div class="grid" id="pet-select-grid"></div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="pet-detail-modal">
+    <div class="modal-box" style="text-align:center; max-width: 340px;">
+        <div class="modal-header"><h3>🔍 Thông Tin & Huấn Luyện</h3><button class="modal-close" onclick="closeModal('pet-detail-modal')">✕</button></div>
+        <img id="pd-img" style="width:120px;height:120px;border-radius:20px;border:3px solid var(--border);margin:0 auto;box-shadow:var(--shadow-card)">
+        <h2 id="pd-name" style="margin-top:12px;font-size:18px">Name</h2>
+        <div id="pd-type-badges" class="type-badges" style="margin-bottom:8px"></div>
+        
+        <div class="stat-box"><span>Cấp độ (Tuổi)</span><span class="stat-val" id="pd-lvl">1</span></div>
+        <div class="stat-box"><span>Sức mạnh (PWR)</span><span class="stat-val" id="pd-pwr">100</span></div>
+        <div class="stat-box" style="margin-bottom:12px"><span>Trạng thái Tuổi</span><span class="stat-val" id="pd-age-status">Đang Lớn</span></div>
+        
+        <div style="font-weight:800;font-size:13px;text-align:left;margin-bottom:6px">Bộ Kỹ Năng:</div>
+        <div id="pd-skills" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:16px;"></div>
+
+        <div style="display:flex;flex-direction:column;gap:10px">
+            <button id="pd-btn-train" class="btn btn-success" onclick="btnActionTrain()">🍖 Cho ăn & Huấn luyện (5 Xu)</button>
+            <div id="pd-grow-time" style="font-size:13px;color:var(--warning);font-weight:bold;display:none;background:var(--warning-light);padding:8px;border-radius:10px"></div>
+            <button id="pd-btn-pet" class="btn btn-success" style="display:none;" onclick="btnActionPet()">❤️ Vuốt ve (+2 Xu)</button>
+            <button id="pd-btn-grow" class="btn btn-success" style="display:none;" onclick="btnActionGrow()">🍼 Ép lớn nhanh (30 Xu)</button>
+            <button id="pd-btn-release" class="btn btn-primary" style="display:none;" onclick="btnActionRelease()">🏕️ Thả vào Vườn</button>
+            <button id="pd-btn-recall" class="btn btn-primary" style="display:none;" onclick="btnActionRecall()">🎒 Thu hồi về Túi</button>
+            
+            <button class="btn btn-outline" onclick="btnActionRename()">✏️ Đổi Tên Thú</button>
+            <button id="pd-btn-sell" class="btn btn-danger" onclick="btnActionSell()">💰 Bán lấy Xu</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="pvp-setup-modal">
+    <div class="modal-box">
+        <div class="modal-header"><h3>⚔️ Chọn Tổ Đội (3 Thú)</h3><button class="modal-close" onclick="closeModal('pvp-setup-modal')">✕</button></div>
+        <div style="text-align:center;margin-bottom:10px;font-size:13px">Nhập mã phòng (Để trống đấu với AI)</div>
+        <input type="text" id="pvp-room-code" placeholder="Mã phòng..." style="text-align:center;text-transform:uppercase">
+        <div class="grid" id="pvp-team-grid" style="margin: 15px 0;"></div>
+        <button class="btn btn-danger" style="padding:16px; font-size:16px; width:100%" onclick="startPVPBattle()">🔥 TÌM ĐỐI THỦ</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="pvp-battle-modal">
+    <div class="modal-box" style="background:#0f172a; border:none; max-width:600px;">
+        <div class="pvp-header">
+            <div class="pvp-pet-card" id="pvp-p1-card">
+                <div style="font-size:12px;margin-bottom:4px;color:#94a3b8">BẠN</div>
+                <img id="pvp-p1-img" src="">
+                <div style="font-weight:bold;margin-top:4px" id="pvp-p1-name">Pet 1</div>
+                <div class="pvp-hp-bar" style="margin:6px auto"><div class="pvp-hp-fill" id="pvp-p1-hp"></div></div>
+            </div>
+            <div style="font-size:24px; font-weight:900; color:#ef4444; font-style:italic">VS</div>
+            <div class="pvp-pet-card" id="pvp-p2-card">
+                <div style="font-size:12px;margin-bottom:4px;color:#94a3b8">ĐỐI THỦ</div>
+                <img id="pvp-p2-img" src="">
+                <div style="font-weight:bold;margin-top:4px" id="pvp-p2-name">Pet 2</div>
+                <div class="pvp-hp-bar" style="margin:6px auto"><div class="pvp-hp-fill" id="pvp-p2-hp"></div></div>
+            </div>
+        </div>
+        <div class="pvp-log" id="pvp-log"></div>
+        <div class="pvp-skills" id="pvp-skills-container"></div>
+        <div id="pvp-team-roster" style="display:flex; gap:12px; margin-top:15px; justify-content:center; border-top: 1px dashed #334155; padding-top: 15px;"></div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="skill-replace-modal">
+    <div class="modal-box">
+        <div class="modal-header"><h3>🧠 Quên Kỹ Năng Cũ?</h3></div>
+        <p style="font-size:13px; text-align:center; margin-bottom:15px;">Thú của bạn muốn học <b id="sr-new-skill" style="color:var(--primary)">Kỹ năng</b> nhưng đã đầy 4 ô. Chọn 1 chiêu để quên!</p>
+        <div id="sr-skill-list" style="display:flex; flex-direction:column; gap:8px; margin-bottom:15px;"></div>
+        <button class="btn btn-outline" style="width:100%" onclick="cancelLearnSkill()">Giữ nguyên chiêu cũ</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="edit-word-modal">
+    <div class="modal-box">
+        <div class="modal-header"><h3>✏️ Sửa Từ Vựng</h3><button class="modal-close" onclick="closeModal('edit-word-modal')">✕</button></div>
+        <input type="hidden" id="edit-word-idx">
+        <div class="sec-label">Từ vựng (Tiếng Anh)</div>
+        <input type="text" id="edit-word-en">
+        <div class="sec-label">Nghĩa (Tiếng Việt)</div>
+        <input type="text" id="edit-word-vi">
+        <div class="sec-label">Định nghĩa (Tùy chọn)</div>
+        <textarea id="edit-word-def" rows="2"></textarea>
+        <div class="sec-label">Cấp độ CEFR</div>
+        <select id="edit-word-cefr">
+            <option value="A1">A1 - Sơ cấp</option>
+            <option value="A2">A2 - Sơ trung cấp</option>
+            <option value="B1">B1 - Trung cấp</option>
+            <option value="B2">B2 - Trung cao cấp</option>
+            <option value="C1">C1 - Cao cấp</option>
+            <option value="C2">C2 - Thành thạo</option>
+        </select>
+        <button class="btn btn-primary" onclick="saveEditedWord()">💾 Lưu Thay Đổi</button>
+    </div>
+</div>
 
 <div id="learning-screen" class="hidden">
     <div class="learn-card">
@@ -319,6 +437,7 @@
         <div id="timer-bar"><div id="timer-fill"></div></div>
         <div id="flashcard-area">
             <div id="streak-display">🔥 Streak: 0/3</div>
+            <div id="wave-display"></div>
             <div id="fc-word">Word</div>
             <button id="speakBtn" onclick="speakCurrent()" style="background:none;border:none;font-size:30px;cursor:pointer;display:none;color:var(--primary);margin:8px auto;width:auto">🔊</button>
             <div id="fc-hint" style="color:var(--text2);font-size:13px;margin-top:6px;font-style:italic;min-height:20px"></div>
@@ -331,726 +450,906 @@
 </div>
 
 <script>
-// ==========================================
-// FIREBASE
-// ==========================================
-const firebaseConfig = {
-    apiKey: "AIzaSyCWZHCnZRrOrX7n-fsUGJw8iTynWIK4cKQ",
-    authDomain: "daichienlophoc.firebaseapp.com",
-    databaseURL: "https://daichienlophoc-default-rtdb.firebaseio.com",
-    projectId: "daichienlophoc",
-    storageBucket: "daichienlophoc.firebasestorage.app",
-    messagingSenderId: "918701241713",
-    appId: "1:918701241713:web:a820e86139d713649c72d0",
-    measurementId: "G-D0HP049N33"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
-let currentUser = null;
-let ud = {data:[],coins:300,lastLogin:'',loginStreak:0,eco:{xp:0,incubators:[{id:1,dna:null,startTime:null,baseDuration:60000}],collection:[],entities:[],areas:[{id:1,name:'Khu 1',entities:[]}]},hatchStart:null,items:[]};
-
-// ==========================================
-// HỆ THỐNG HỆ (ĐÃ MỞ RỘNG)
-// ==========================================
-const ELEMENTS = ["earth","fire","water","air","grass","poison","flying","bug","ice","rock","electric","dark","light","cosmic"];
-
-const CREATURES = {
-    common: [
-        {type:'dog',name:'Chó Con',e:'🐕',rarity:'common',element:'earth'},{type:'cat',name:'Mèo Mướp',e:'🐱',rarity:'common',element:'earth'},{type:'rabbit',name:'Thỏ Trắng',e:'🐰',rarity:'common',element:'earth'},{type:'chicken',name:'Gà Chip',e:'🐔',rarity:'common',element:'flying'},{type:'fish',name:'Cá Vàng',e:'🐟',rarity:'common',element:'water'},{type:'bird',name:'Chim Sẻ',e:'🐦',rarity:'common',element:'flying'},{type:'fox',name:'Cáo Lửa',e:'🦊',rarity:'common',element:'fire'},{type:'turtle',name:'Rùa Cạn',e:'🐢',rarity:'common',element:'rock'},{type:'panda',name:'Gấu Trúc',e:'🐼',rarity:'common',element:'grass'},{type:'pig',name:'Heo Ống',e:'🐷',rarity:'common',element:'earth'},
-        {type:'hamster',name:'Chuột Hamster',e:'🐹',rarity:'common',element:'earth'},{type:'koala',name:'Gấu Koala',e:'🐨',rarity:'common',element:'grass'},{type:'duck',name:'Vịt Con',e:'🦆',rarity:'common',element:'water'},{type:'cow',name:'Bò Sữa',e:'🐮',rarity:'common',element:'earth'},{type:'sheep',name:'Cừu Non',e:'🐑',rarity:'common',element:'earth'},{type:'lion',name:'Sư Tử Con',e:'🦁',rarity:'common',element:'fire'},{type:'tiger',name:'Hổ Con',e:'🐅',rarity:'common',element:'fire'},{type:'elephant',name:'Voi Con',e:'🐘',rarity:'common',element:'earth'},{type:'monkey',name:'Khỉ Con',e:'🐒',rarity:'common',element:'air'},{type:'penguin',name:'Chim Cánh Cụt',e:'🐧',rarity:'common',element:'ice'},
-        {type:'frog',name:'Ếch Nhỏ',e:'🐸',rarity:'common',element:'water'},{type:'snake',name:'Rắn Con',e:'🐍',rarity:'common',element:'poison'},{type:'bear',name:'Gấu Nâu',e:'🐻',rarity:'common',element:'earth'},{type:'wolf',name:'Sói Con',e:'🐺',rarity:'common',element:'dark'},{type:'deer',name:'Hươu Con',e:'🦌',rarity:'common',element:'grass'},{type:'horse',name:'Ngựa Con',e:'🐴',rarity:'common',element:'earth'},{type:'zebra',name:'Ngựa Vằn',e:'🦓',rarity:'common',element:'earth'},{type:'giraffe',name:'Hươu Cao Cổ',e:'🦒',rarity:'common',element:'grass'},{type:'hippo',name:'Hà Mã Con',e:'🦛',rarity:'common',element:'water'},{type:'rhino',name:'Tê Giác Con',e:'🦏',rarity:'common',element:'rock'},
-        {type:'kangaroo',name:'Chuột Túi',e:'🦘',rarity:'common',element:'earth'},{type:'sloth',name:'Lười Con',e:'🦥',rarity:'common',element:'grass'},{type:'otter',name:'Rái Cá',e:'🦦',rarity:'common',element:'water'},{type:'seal',name:'Hải Cẩu',e:'🦭',rarity:'common',element:'ice'},{type:'shark',name:'Cá Mập Con',e:'🦈',rarity:'common',element:'water'},{type:'octopus',name:'Bạch Tuộc',e:'🐙',rarity:'common',element:'water'},{type:'crab',name:'Cua Con',e:'🦀',rarity:'common',element:'water'},{type:'butterfly',name:'Bướm',e:'🦋',rarity:'common',element:'bug'},{type:'bee',name:'Ong',e:'🐝',rarity:'common',element:'bug'},{type:'ant',name:'Kiến',e:'🐜',rarity:'common',element:'bug'},
-        {type:'spider',name:'Nhện',e:'🕷️',rarity:'common',element:'poison'},{type:'ladybug',name:'Bọ Rùa',e:'🐞',rarity:'common',element:'bug'},{type:'dragonfly',name:'Chuồn Chuồn',e:'🪰',rarity:'common',element:'flying'},{type:'caterpillar',name:'Sâu',e:'🐛',rarity:'common',element:'bug'},{type:'snail',name:'Ốc Sên',e:'🐌',rarity:'common',element:'grass'},{type:'hedgehog',name:'Nhím',e:'🦔',rarity:'common',element:'earth'},{type:'squirrel',name:'Sóc',e:'🐿️',rarity:'common',element:'earth'},{type:'raccoon',name:'Gấu Mèo',e:'🦝',rarity:'common',element:'dark'},{type:'bat',name:'Dơi',e:'🦇',rarity:'common',element:'dark'}
-    ],
-    rare: [{type:'phoenix',name:'Phượng Hoàng',e:'🔥',rarity:'rare',element:'fire'},{type:'unicorn',name:'Kỳ Lân',e:'🦄',rarity:'rare',element:'light'},{type:'dragon',name:'Rồng Con',e:'🐲',rarity:'rare',element:'fire'},{type:'mermaid',name:'Nàng Tiên Cá',e:'🧜‍♀️',rarity:'rare',element:'water'},{type:'fairy',name:'Tiên Nữ',e:'🧚',rarity:'rare',element:'light'},{type:'robot',name:'Robot',e:'🤖',rarity:'rare',element:'electric'},{type:'ninja cat',name:'Mèo Ninja',e:'🐱',rarity:'rare',element:'air'},{type:'ghost fox',name:'Cáo Ma',e:'🦊',rarity:'rare',element:'dark'},{type:'ice wolf',name:'Sói Băng',e:'🐺',rarity:'rare',element:'ice'},{type:'thunder bird',name:'Chim Sét',e:'🐦',rarity:'rare',element:'electric'},{type:'forest guardian',name:'Thủ Lâm',e:'🌳',rarity:'rare',element:'grass'},{type:'lava turtle',name:'Rùa Lửa',e:'🐢',rarity:'rare',element:'fire'},{type:'crystal deer',name:'Hươu Pha Lê',e:'🦌',rarity:'rare',element:'light'}],
-    ultraRare: [{type:'shadow dragon',name:'Rồng Bóng Tối',e:'🌑',rarity:'ultra',element:'dark'},{type:'golden phoenix',name:'Phượng Hoàng Vàng',e:'🔥',rarity:'ultra',element:'fire'},{type:'crystal unicorn',name:'Kỳ Lân Pha Lê',e:'🦄',rarity:'ultra',element:'light'},{type:'storm griffin',name:'Griffin Bão',e:'🦅',rarity:'ultra',element:'air'}],
-    legendary: [{type:'griffin',name:'Griffin Vàng',e:'🦅',rarity:'legendary',element:'flying'},{type:'pegasus',name:'Pegasus',e:'🐴',rarity:'legendary',element:'light'},{type:'nine-tailed fox',name:'Cáo 9 Đuôi',e:'🦊',rarity:'legendary',element:'fire'},{type:'ancient turtle',name:'Rùa Thần',e:'🐢',rarity:'legendary',element:'earth'},{type:'eternal dragon',name:'Rồng Vĩnh Cửu',e:'🐲',rarity:'legendary',element:'fire'}],
-    mythic: [{type:'cosmic whale',name:'Cá Voi Vũ Trụ',e:'🐋',rarity:'mythic',element:'cosmic'},{type:'void phoenix',name:'Phượng Hoàng Hư Vô',e:'🌌',rarity:'mythic',element:'dark'},{type:'eternal tree spirit',name:'Thần Cây Vĩnh Cửu',e:'🌳',rarity:'mythic',element:'grass'},{type:'star lion',name:'Sư Tử Sao',e:'🦁',rarity:'mythic',element:'light'},{type:'time fox',name:'Cáo Thời Gian',e:'🦊',rarity:'mythic',element:'cosmic'}]
-};
-
-function genCreature(r='common'){
-    const pool = CREATURES[r] || CREATURES.common;
-    const c = pool[Math.floor(Math.random()*pool.length)];
-    return {...c, stage:'baby', hunger:100, happiness:100, imgUrl: `https://image.pollinations.ai/prompt/${encodeURIComponent(c.rarity==='mythic'?'epic cosmic glowing':c.rarity==='legendary'?'epic fantasy glowing':'cute kawaii')} ${c.type}, chibi cartoon, pastel colors, white background&width=200&height=200&nologo=true&seed=${hashStr(c.type)}`};
+/* ==========================================
+   GLOBAL TOAST & UTILS
+   ========================================== */
+let toastTimeout;
+function showToast(msg) {
+    const el = document.getElementById('global-toast');
+    el.innerHTML = msg; el.style.opacity = '1'; el.style.transform = 'translate(-50%, 0)';
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translate(-50%, -10px)'; }, 3000);
 }
-
-function hybridize(p1,p2){
-    const pre=['Siêu','Huyền','Thần','Ma','Vương','Linh','Vô','Cực','Huyền Ảo'][Math.floor(Math.random()*9)];
-    const name=pre+' '+p1.name.split(' ').pop()+'-'+p2.name.split(' ').pop();
-    let rarity='common';
-    if(p1.rarity!=='common'&&p2.rarity!=='common')rarity=Math.random()<.5?'rare':'legendary';
-    else if(p1.rarity!=='common'||p2.rarity!=='common')rarity=Math.random()<.4?'rare':'common';
-    if(Math.random()<.08)rarity='ultra';
-    if(Math.random()<.03)rarity='legendary';
-    if(Math.random()<.005)rarity='mythic';
-    const ht=p1.type+'-'+p2.type;
-    return{...genCreature(rarity),name,type:ht,e:Math.random()<.5?p1.e:p2.e,stage:'baby',imgUrl:`https://image.pollinations.ai/prompt/${encodeURIComponent('dual element hybrid '+ht+', ultra cute or epic, chibi cartoon, pastel colors, white background')}&width=200&height=200&nologo=true&seed=${hashStr(ht)}`};
-}
+function getSellPrice(rarity) { return rarity==='mythic'?1500 : rarity==='legendary'?600 : rarity==='epic'?200 : rarity==='rare'?70 : 20; }
 function hashStr(s){let h=0;for(let i=0;i<s.length;i++)h=((h<<5)-h)+s.charCodeAt(i);return Math.abs(h)}
 
-async function loadUserData(username){
-    return new Promise(resolve=>{
-        db.ref('users/'+username).once('value',snap=>{resolve(snap.val());});
-    });
-}
-async function saveUserData(){
-    if(currentUser) db.ref('users/'+currentUser).set(ud);
+/* ==========================================
+   HỆ THỐNG 18 NGUYÊN TỐ (TYPES) & TƯƠNG KHẮC
+   ========================================== */
+const TYPES = {
+    Normal: { vn: 'Thường', c: '#A8A77A', i: '⚪' }, Fire: { vn: 'Lửa', c: '#EE8130', i: '🔥' },
+    Water: { vn: 'Nước', c: '#6390F0', i: '💧' }, Grass: { vn: 'Cỏ', c: '#7AC74C', i: '🌿' },
+    Electric: { vn: 'Điện', c: '#F7D02C', i: '⚡' }, Ice: { vn: 'Băng', c: '#96D9D6', i: '❄️' },
+    Fighting: { vn: 'Giác Đấu', c: '#C22E28', i: '🥊' }, Poison: { vn: 'Độc', c: '#A33EA1', i: '☠️' },
+    Ground: { vn: 'Đất', c: '#E2BF65', i: '🏜️' }, Flying: { vn: 'Bay', c: '#A98FF3', i: '💨' },
+    Psychic: { vn: 'Tâm Linh', c: '#F95587', i: '👁️' }, Bug: { vn: 'Côn Trùng', c: '#A6B91A', i: '🐛' },
+    Rock: { vn: 'Đá', c: '#B6A136', i: '🪨' }, Ghost: { vn: 'Ma', c: '#735797', i: '👻' },
+    Dragon: { vn: 'Rồng', c: '#6F35FC', i: '🐉' }, Steel: { vn: 'Thép', c: '#B7B7CE', i: '⚙️' },
+    Dark: { vn: 'Bóng Tối', c: '#705746', i: '🌑' }, Fairy: { vn: 'Tiên', c: '#D685AD', i: '✨' }
+};
+
+const TYPE_CHART = {
+    Normal: { Rock: 0.5, Ghost: 0, Steel: 0.5 },
+    Fire: { Fire: 0.5, Water: 0.5, Grass: 2, Ice: 2, Bug: 2, Rock: 0.5, Dragon: 0.5, Steel: 2 },
+    Water: { Fire: 2, Water: 0.5, Grass: 0.5, Ground: 2, Rock: 2, Dragon: 0.5 },
+    Electric: { Water: 2, Electric: 0.5, Grass: 0.5, Ground: 0, Flying: 2, Dragon: 0.5 },
+    Grass: { Fire: 0.5, Water: 2, Grass: 0.5, Poison: 0.5, Ground: 2, Flying: 0.5, Bug: 0.5, Rock: 2, Dragon: 0.5, Steel: 0.5 },
+    Ice: { Fire: 0.5, Water: 0.5, Grass: 2, Ice: 0.5, Ground: 2, Flying: 2, Dragon: 2, Steel: 0.5 },
+    Fighting: { Normal: 2, Ice: 2, Poison: 0.5, Flying: 0.5, Psychic: 0.5, Bug: 0.5, Rock: 2, Ghost: 0, Dark: 2, Steel: 2, Fairy: 0.5 },
+    Poison: { Grass: 2, Poison: 0.5, Ground: 0.5, Rock: 0.5, Ghost: 0.5, Steel: 0, Fairy: 2 },
+    Ground: { Fire: 2, Water: 0.5, Electric: 2, Grass: 0.5, Poison: 2, Flying: 0, Bug: 0.5, Rock: 2, Steel: 2 },
+    Flying: { Electric: 0.5, Grass: 2, Fighting: 2, Bug: 2, Rock: 0.5, Steel: 0.5 },
+    Psychic: { Fighting: 2, Poison: 2, Psychic: 0.5, Dark: 0, Steel: 0.5 },
+    Bug: { Fire: 0.5, Grass: 2, Fighting: 0.5, Poison: 0.5, Flying: 0.5, Psychic: 2, Ghost: 0.5, Dark: 2, Steel: 0.5, Fairy: 0.5 },
+    Rock: { Fire: 2, Water: 0.5, Grass: 0.5, Ice: 2, Fighting: 0.5, Ground: 0.5, Flying: 2, Bug: 2, Steel: 0.5 },
+    Ghost: { Normal: 0, Psychic: 2, Ghost: 2, Dark: 0.5 },
+    Dragon: { Dragon: 2, Steel: 0.5, Fairy: 0 },
+    Steel: { Fire: 0.5, Water: 0.5, Electric: 0.5, Ice: 2, Rock: 2, Steel: 0.5, Fairy: 2 },
+    Dark: { Fighting: 0.5, Psychic: 2, Ghost: 2, Dark: 0.5, Fairy: 0.5 },
+    Fairy: { Fire: 0.5, Fighting: 2, Poison: 0.5, Dragon: 2, Dark: 2, Steel: 0.5 }
+};
+
+function getEffectiveness(atkType, defTypes) {
+    let mult = 1;
+    defTypes.forEach(t => { if(TYPE_CHART[atkType] && TYPE_CHART[atkType][t] !== undefined) mult *= TYPE_CHART[atkType][t]; });
+    return mult;
 }
 
-async function handleLogin(type){
-    const u=document.getElementById('username').value.trim(),p=document.getElementById('password').value.trim(),msg=document.getElementById('login-msg');
-    if(!u||!p){msg.innerText='Nhập đủ thông tin!';return}
-    const existing=await loadUserData(u);
+// BỘ KỸ NĂNG THEO HỆ
+const SKILL_POOL = {
+    Normal: [{n:'Húc',p:40},{n:'Cào xé',p:60},{n:'Tấn công nhanh',p:80},{n:'Siêu Năng Lực Cắn',p:100}],
+    Fire: [{n:'Tàn Lửa',p:40},{n:'Bánh Xe Lửa',p:60},{n:'Phun Lửa',p:90},{n:'Vụ Nổ Rực Rỡ',p:120}],
+    Water: [{n:'Bong Bóng',p:40},{n:'Súng Nước',p:60},{n:'Lướt Sóng',p:90},{n:'Sóng Thần',p:120}],
+    Grass: [{n:'Lá Cắt',p:40},{n:'Hạt Giống',p:60},{n:'Bão Lá',p:90},{n:'Tia Sáng Mặt Trời',p:120}],
+    Electric: [{n:'Điện Giật',p:40},{n:'Tia Chớp',p:60},{n:'Phóng Sấm',p:90},{n:'Sấm Rền',p:120}],
+    Ice: [{n:'Gió Băng',p:40},{n:'Phóng Băng',p:60},{n:'Tia Băng',p:90},{n:'Bão Tuyết',p:120}],
+    Fighting: [{n:'Đấm',p:40},{n:'Đá Liên Hoàn',p:60},{n:'Lên Gối',p:90},{n:'Cận Chiến',p:120}],
+    Poison: [{n:'Phun Độc',p:40},{n:'Kim Độc',p:60},{n:'Bùn Độc',p:90},{n:'Sóng Độc',p:120}],
+    Ground: [{n:'Ném Bùn',p:40},{n:'Đá Rơi',p:60},{n:'Động Đất',p:90},{n:'Vực Nứt',p:120}],
+    Flying: [{n:'Mổ',p:40},{n:'Cuồng Phong',p:60},{n:'Khoan Mỏ',p:90},{n:'Cú Bổ Nhào',p:120}],
+    Psychic: [{n:'Nhìn Trừng',p:40},{n:'Tia Tâm Linh',p:60},{n:'Ngoại Cảm',p:90},{n:'Lốc Tương Lai',p:120}],
+    Bug: [{n:'Gặm',p:40},{n:'Tơ Nhện',p:60},{n:'Cắn Nhức',p:90},{n:'Sốc Ký Sinh',p:120}],
+    Rock: [{n:'Ném Đá',p:40},{n:'Lăn Đá',p:60},{n:'Núi Sạt Lở',p:90},{n:'Bão Cát',p:120}],
+    Ghost: [{n:'Nhát Ma',p:40},{n:'Cầu Bóng Tối',p:60},{n:'Vuốt Tử Thần',p:90},{n:'Lời Nguyền',p:120}],
+    Dragon: [{n:'Phẫn Nộ',p:40},{n:'Vuốt Rồng',p:60},{n:'Xung Kích Rồng',p:90},{n:'Sao Băng Long',p:120}],
+    Steel: [{n:'Cánh Kim Loại',p:40},{n:'Đầu Sắt',p:60},{n:'Đuôi Sắt',p:90},{n:'Đâm Sao Chổi',p:120}],
+    Dark: [{n:'Cắn Phập',p:40},{n:'Đánh Lén',p:60},{n:'Xung Kích Tối',p:90},{n:'Hủy Diệt',p:120}],
+    Fairy: [{n:'Gió Tiên',p:40},{n:'Hôn Ma Thuật',p:60},{n:'Sáng Chói',p:90},{n:'Mặt Trăng Rơi',p:120}]
+};
+
+function renderTypeBadges(typesArr) {
+    if(!typesArr || typesArr.length === 0) typesArr = ['Normal'];
+    return typesArr.map(t => {
+        const info = TYPES[t] || TYPES.Normal;
+        return `<span class="type-badge" style="background-color: ${info.c}">${info.i} ${info.vn}</span>`;
+    }).join('');
+}
+
+/* ==========================================
+   DATABASE 300 SINH VẬT NÉN CHUỖI 
+   ========================================== */
+const RAW_PETS = {
+    common: [
+        "dog|Chó Con|🐕|Normal", "cat|Mèo Mướp|🐱|Normal", "mouse|Chuột|🐭|Normal", "rabbit|Thỏ|🐰|Normal", "chicken|Gà Con|🐔|Flying,Normal",
+        "duck|Vịt|🦆|Water,Flying", "pig|Heo|🐷|Normal", "cow|Bò Sữa|🐮|Normal", "sheep|Cừu|🐑|Normal", "horse|Ngựa|🐴|Normal",
+        "frog|Ếch|🐸|Water,Poison", "turtle|Rùa|🐢|Water", "snail|Ốc Sên|🐌|Bug,Water", "ant|Kiến|🐜|Bug,Ground", "bee|Ong Mật|🐝|Bug,Flying",
+        "butterfly|Bướm|🦋|Bug,Flying", "fish|Cá Chép|🐟|Water", "crab|Cua|🦀|Water", "shrimp|Tôm|🦐|Water", "squid|Mực|🦑|Water",
+        "starfish|Sao Biển|⭐|Water", "beetle|Bọ Cánh Cứng|🪲|Bug", "spider|Nhện|🕷️|Bug,Poison", "worm|Giun Đất|🪱|Ground", "lizard|Thằn Lằn|🦎|Normal",
+        "hamster|Hamster|🐹|Normal", "pigeon|Bồ Câu|🕊️|Flying", "crow|Quạ|🐦‍⬛|Flying,Dark", "sparrow|Chim Sẻ|🐦|Flying", "bat|Dơi|🦇|Flying,Poison",
+        "mud|Cục Bùn|💩|Ground", "pebble|Hòn Đá|🪨|Rock", "spark|Tia Lửa|🔥|Fire", "droplet|Giọt Nước|💧|Water", "leaf|Lá Cây|🌿|Grass",
+        "breeze|Gió Nhẹ|💨|Flying", "static|Tĩnh Điện|⚡|Electric", "frost|Sương Giá|❄️|Ice", "spook|Ma Nhỏ|👻|Ghost", "cog|Bánh Răng|⚙️|Steel",
+        "mind|Trí Ốc Nhỏ|👁️|Psychic", "fairy_dust|Bụi Tiên|✨|Fairy", "shadow|Cái Bóng|🌑|Dark", "punch|Võ Sĩ Nhí|🥊|Fighting", "scale|Vảy Rồng|🐉|Dragon",
+        "toxin|Giọt Độc|☠️|Poison", "caterpillar|Sâu Bướm|🐛|Bug", "magikarp|Cá Vàng|🐠|Water", "rat|Chuột Cống|🐀|Normal,Dark", "monkey|Khỉ Nhỏ|🐒|Normal"
+    ],
+    rare: [
+        "fox|Cáo Lửa|🦊|Fire", "wolf|Sói|🐺|Normal,Dark", "bear|Gấu|🐻|Normal", "lion|Sư Tử|🦁|Fire", "tiger|Hổ|🐯|Normal",
+        "leopard|Báo|🐆|Normal", "elephant|Voi|🐘|Ground", "giraffe|Hươu|🦒|Normal", "zebra|Ngựa Vằn|🦓|Normal", "rhino|Tê Giác|🦏|Ground,Rock",
+        "hippo|Hà Mã|🦛|Water", "gorilla|Khỉ Đột|🦍|Fighting", "kangaroo|Chuột Túi|🦘|Fighting", "koala|Koala|🐨|Normal", "panda|Gấu Trúc|🐼|Normal,Fighting",
+        "sloth|Lười|🦥|Normal", "raccoon|Gấu Mèo|🦝|Dark", "penguin|Cánh Cụt|🐧|Water,Ice", "owl|Cú|🦉|Flying,Psychic", "eagle|Đại Bàng|🦅|Flying",
+        "falcon|Chim Ưng|🦅|Flying,Fighting", "snake|Rắn Độc|🐍|Poison", "crocodile|Cá Sấu|🐊|Water,Dark", "shark|Cá Mập|🦈|Water,Dark", "dolphin|Cá Heo|🐬|Water,Fairy",
+        "fire_dog|Chó Lửa|🐕|Fire", "ice_cat|Mèo Băng|🐱|Ice", "electric_mouse|Chuột Điện|🐭|Electric", "ninja_frog|Ếch Ninja|🐸|Water,Fighting", "rock_turtle|Rùa Đá|🐢|Rock,Water",
+        "steel_ant|Kiến Thép|🐜|Bug,Steel", "poison_bee|Ong Độc|🐝|Bug,Poison", "psychic_butterfly|Bướm Ảo|🦋|Bug,Psychic", "ghost_fish|Cá Ma|🐟|Water,Ghost", "lava_crab|Cua Lava|🦀|Water,Fire",
+        "shadow_bat|Dơi Tối|🦇|Flying,Dark", "magic_sparrow|Chim Phép|🐦|Flying,Fairy", "earth_worm|Giun Đất Cự|🪱|Ground,Poison", "crystal_spider|Nhện Pha Lê|🕷️|Bug,Ice", "fighter_monkey|Khỉ Võ|🐒|Fighting"
+    ],
+    epic: [
+        "griffin|Điểu Sư|🦅|Flying,Fighting", "chimera|Chimera|🦁|Fire,Poison", "manticore|Manticore|🦂|Poison,Flying", "basilisk|Tử Xà|🐍|Poison,Dark", "kraken|Thủy Quái|🦑|Water,Dark",
+        "leviathan|Giao Long|🐋|Water,Dragon", "yeti|Người Tuyết|⛄|Ice,Fighting", "wendigo|Ác Quỷ|🦌|Ice,Dark", "chupacabra|Chupacabra|🦇|Dark,Poison", "mothman|Người Nhện|🦋|Bug,Dark",
+        "thunderbird|Lôi Điểu|⚡|Electric,Flying", "jackalope|Thỏ Sừng|🐰|Normal,Fairy", "kitsune|Cáo 9 Đuôi|🦊|Fire,Psychic", "tengu|Thiên Cẩu|👺|Flying,Dark", "kappa|Hà Bá|🐢|Water,Dark",
+        "oni|Quỷ Oni|👹|Fighting,Dark", "gargoyle|Thú Đá|🦇|Rock,Flying", "minotaur|Ngưu Ma|🐂|Fighting,Ground", "centaur|Nhân Mã|🐎|Fighting,Normal", "pegasus|Thiên Mã|🐎|Flying,Fairy",
+        "unicorn|Kỳ Lân|🦄|Fairy,Psychic", "alicorn|Thiên Kỳ Lân|🦄|Fairy,Flying", "kelpie|Ngựa Nước|🐴|Water,Ghost", "hippogriff|Bằng Mã|🦅|Flying,Normal", "harpy|Yêu Điểu|🦅|Flying,Dark",
+        "magma_golem|Golem Lửa|🪨|Rock,Fire", "frost_dragon|Rồng Tuyết|🐉|Dragon,Ice", "steel_titan|Người Thép|⚙️|Steel,Fighting", "toxic_sludge|Quái Bùn|☠️|Poison,Dark", "nature_spirit|Tinh Linh|🌿|Grass,Fairy"
+    ],
+    legendary: [
+        "dragon|Hỏa Long|🐉|Dragon,Fire", "phoenix|Phượng Lửa|🔥|Fire,Flying", "behemoth|Cự Thú|🦏|Ground,Rock", "ziz|Cự Điểu Ziz|🦅|Flying,Normal", "bahamut|Thần Long|🐲|Dragon,Steel",
+        "jormungandr|Mãng Xà|🐍|Water,Poison", "quetzalcoatl|Rắn Vũ|🐉|Dragon,Flying", "ryujin|Long Vương|🐉|Water,Dragon", "shenlong|Thần Long Thần|🐲|Dragon,Psychic", "anubis|Tử Thần|🐺|Ghost,Ground",
+        "sphinx|Nhân Sư|🦁|Ground,Psychic", "cerberus|Chó 3 Đầu|🐕‍🦺|Fire,Dark", "hydra|Cửu Đầu Xà|🐉|Dragon,Poison", "nemean_lion|Sư Tử Thần|🦁|Normal,Rock", "fenrir|Sói Tận Thế|🐺|Dark,Ice",
+        "titan|Khổng Lồ|🪨|Rock,Fighting", "valkyrie|Chiến Thần Nữ|✨|Fairy,Fighting", "leviathan_king|Vua Biển Sâu|🐋|Water,Dark", "ra|Thần Mặt Trời|🌞|Fire,Psychic", "odin|Thần Sấm|⚡|Electric,Fighting"
+    ],
+    mythic: [
+        "cosmic_whale|Cá Voi Vũ Trụ|🌌|Water,Psychic", "astral_dragon|Rồng Tinh Tú|✨|Dragon,Psychic", "void_walker|Kẻ Vô Dạng|🕳️|Dark,Ghost", "chronos_turtle|Rùa Thời Gian|⏳|Water,Steel", "solaris_phoenix|Phượng Thái Dương|🌞|Fire,Fairy",
+        "galaxy_serpent|Rắn Ngân Hà|🌌|Dragon,Dark", "dimension_weaver|Kẻ Rẽ Không Gian|👁️|Psychic,Ghost", "core_guardian|Vệ Binh Trái Đất|🌋|Fire,Ground", "starlight_unicorn|Kỳ Lân Ánh Sao|🦄|Fairy,Psychic", "abyss_lord|Chúa Tể Vực Thẳm|🌑|Dark,Dragon"
+    ]
+};
+
+const CREATURES = {};
+for(let r in RAW_PETS) {
+    CREATURES[r] = RAW_PETS[r].map(str => {
+        let p = str.split('|');
+        return { type: p[0], name: p[1], e: p[2], types: p[3].split(','), rarity: r };
+    });
+}
+
+function getStylePrompt(types) {
+    let s = "fantasy creature, chibi, pastel background, game asset";
+    if(!types) return s;
+    if(types.includes('Fire')) s += ", fiery aura, flames";
+    if(types.includes('Water')) s += ", aquatic, water splashes";
+    if(types.includes('Dark')) s += ", dark shadows, purple glow";
+    if(types.includes('Electric')) s += ", lightning bolts, yellow glow";
+    if(types.includes('Ice')) s += ", frozen, frosty aura, crystals";
+    if(types.includes('Grass')) s += ", nature, leaves, vines";
+    return s;
+}
+
+function petImageUrl(name, rarity, types){
+    let s = getStylePrompt(types) + " ";
+    if(rarity==='mythic') s += 'epic cosmic glowing astral divine';
+    else if(rarity==='legendary') s += 'epic powerful majestic glowing aura, extremely badass';
+    else if(rarity==='epic') s += 'cool fantasy 3d magical shiny';
+    else if(rarity==='rare') s += 'magical sparkly beautiful, super cute OR super cool';
+    else s += 'cute kawaii chibi adorable';
+    return `https://image.pollinations.ai/prompt/${encodeURIComponent(s+' '+name+', cartoon, white background')}&width=200&height=200&nologo=true&seed=${hashStr(name)}`;
+}
+
+function getRandomSkill(types) {
+    const t = types[Math.floor(Math.random() * types.length)];
+    const pool = SKILL_POOL[t] || SKILL_POOL.Normal;
+    const skillObj = pool[Math.floor(Math.random() * 2)]; // Mới sinh ra lấy chiêu yếu
+    return { name: skillObj.n, pwr: skillObj.p, type: t };
+}
+
+function genCreature(r='common'){
+    const pool=CREATURES[r]||CREATURES.common;
+    const c=pool[Math.floor(Math.random()*pool.length)];
+    const s = getRandomSkill(c.types);
+    return{...c, stage:'baby', level: 1, ageTicks: 0, skills: [s], hunger:100, happiness:100, birthTime:Date.now(), lastPetTime:0, imgUrl:petImageUrl(c.type, r, c.types)};
+}
+
+async function hybridize(p1,p2){
+    const isCute=Math.random()<0.5; let name = "Sinh vật bí ẩn";
+    try {
+        const prompt = `Bạn là chuyên gia đặt tên game. Hãy đặt 1 cái tên tiếng Việt cực sáng tạo (tối đa 3 từ) cho thú lai giữa "${p1.name}" và "${p2.name}". Phong cách ${isCute ? 'baby dễ thương' : 'hắc ám siêu ngầu'}. CHỈ IN RA TÊN, KHÔNG GIẢI THÍCH, KHÔNG DÙNG NGOẶC KÉP.`;
+        let aiName = await callAI(prompt);
+        if(aiName && aiName.length < 30) name = aiName.trim().replace(/["']/g, ''); else throw 0;
+    } catch(e) {
+        const coolPrefixes=['Siêu','Huyền','Thần','Ma','Vương']; const cutePrefixes=['Bé','Mini','Chibi','Tiny','Nhỏ'];
+        const pre=(isCute?cutePrefixes:coolPrefixes)[Math.floor(Math.random()*5)];
+        const n1=p1.name.split(' ').pop(),n2=p2.name.split(' ').pop(); name=pre+' '+n1+'-'+n2;
+    }
+    
+    const val = {common:1, rare:2, epic:3, legendary:4, mythic:5};
+    const avg = (val[p1.rarity] + val[p2.rarity]) / 2;
+    let rarity='common';
+    if(avg >= 4) rarity = Math.random()<0.15?'mythic':'legendary'; else if(avg >= 3) rarity = Math.random()<0.25?'legendary':'epic'; else if(avg >= 2) rarity = Math.random()<0.35?'epic':'rare'; else if(avg > 1) rarity = Math.random()<0.45?'rare':'common';
+    
+    let allTypes = [...(p1.types||['Normal']), ...(p2.types||['Normal'])];
+    allTypes = [...new Set(allTypes)].sort(() => Math.random() - 0.5); 
+    let childTypes = allTypes.slice(0, Math.random() < 0.7 ? 2 : 1); 
+    
+    const ht=p1.type+'-'+p2.type;
+    return{type:ht, name, e:(Math.random()<0.5?p1.e:p2.e), types: childTypes, rarity, level: 1, ageTicks: 0, skills: [getRandomSkill(childTypes)], stage:'baby', hunger:100, happiness:100, birthTime:Date.now(), lastPetTime:0, imgUrl:petImageUrl(ht, rarity, childTypes)};
+}
+
+/* LÃO HÓA & CHỈ SỐ */
+function getPetStats(p) {
+    const base = {common:100, rare:150, epic:250, legendary:450, mythic:700}[p.rarity] || 100;
+    const lvlMult = 1 + (p.level * 0.05); // 5% per level
+    
+    let ageMult = 1.0; let status = 'Trưởng thành ⚔️';
+    if(p.ageTicks < 5) { ageMult = 0.6; status = 'Đang Lớn 🍼'; }
+    else if(p.ageTicks < 50) { ageMult = 1.2; status = 'Chín Muồi 🔥'; }
+    else if(p.ageTicks < 100) { ageMult = 1.5; status = 'Huyền Thoại 👑'; }
+    else { ageMult = Math.max(0.8, 1.5 - ((p.ageTicks-100)*0.02)); status = 'Già Cỗi 🍂'; }
+    
+    return { pwr: Math.floor(base * lvlMult * ageMult), status };
+}
+
+
+/* ==========================================
+   DATA & STATE
+   ========================================== */
+let usersDB=JSON.parse(localStorage.getItem('vocaby_v4'))||{};
+let currentUser=null;
+let ud={data:[],coins:0,lastLogin:'',loginStreak:0,eco:{xp:0,dna:null,collection:[],entities:[],areas:[{id:1, name:'Khu 1'}],currentArea:1},hatchStart:null};
+
+function handleLogin(type){
+    const u=document.getElementById('username').value.trim(),p=document.getElementById('password').value.trim();
+    if(!u||!p)return document.getElementById('login-msg').innerText='Nhập đủ thông tin!';
     if(type==='register'){
-        if(existing){msg.innerText='Tài khoản đã tồn tại!';return}
-        ud={password:p,data:[],coins:300,lastLogin:'',loginStreak:0,eco:{xp:0,incubators:[{id:1,dna:null,startTime:null,baseDuration:60000}],collection:[],entities:[],areas:[{id:1,name:'Khu 1',entities:[]}]},hatchStart:null,items:[]};
-        await db.ref('users/'+u).set(ud);
-        loginUser(u);
+        if(usersDB[u])return document.getElementById('login-msg').innerText='Tài khoản đã tồn tại!';
+        usersDB[u]={password:p,data:[],coins:300,lastLogin:'',loginStreak:0,eco:{xp:0,dna:genCreature(),collection:[],entities:[],areas:[{id:1,name:'Khu 1'}],currentArea:1},hatchStart:null};
+        save();loginUser(u);
     }else{
-        if(!existing||existing.password!==p){msg.innerText='Sai tài khoản/mật khẩu!';return}
-        ud=existing;
+        if(!usersDB[u]||usersDB[u].password!==p)return document.getElementById('login-msg').innerText='Sai tài khoản/mật khẩu!';
         loginUser(u);
     }
 }
 function loginUser(u){
-    currentUser=u;
-    if(!ud.eco)ud.eco={xp:0,incubators:[{id:1,dna:null,startTime:null,baseDuration:60000}],collection:[],entities:[],areas:[{id:1,name:'Khu 1',entities:[]}]};
+    currentUser=u;ud=usersDB[u];
+    if(!ud.eco)ud.eco={xp:0,dna:genCreature(),collection:[],entities:[],areas:[{id:1,name:'Khu 1'}],currentArea:1};
+    if(!ud.eco.dna)ud.eco.dna=genCreature(); if(!ud.eco.collection)ud.eco.collection=[]; if(!ud.eco.entities)ud.eco.entities=[];
+    if(!ud.eco.areas || ud.eco.areas.length===0) ud.eco.areas = [{id:1,name:'Khu 1'}]; if(!ud.eco.currentArea) ud.eco.currentArea = 1;
+    
+    ud.eco.collection.forEach(p => { 
+        if(!p.birthTime) p.birthTime = Date.now(); if(!p.types) p.types = ['Normal'];
+        if(!p.level) p.level = 1; if(!p.ageTicks) p.ageTicks = 0;
+        if(!p.skills || p.skills.length===0) p.skills = [getRandomSkill(p.types)];
+    });
+    ud.eco.entities.forEach(e => { 
+        if(e.dna && !e.dna.birthTime) e.dna.birthTime = Date.now(); if(e.dna && !e.dna.types) e.dna.types = ['Normal'];
+        if(e.dna && !e.dna.level) e.dna.level = 1; if(e.dna && !e.dna.ageTicks) e.dna.ageTicks = 0;
+        if(e.dna && (!e.dna.skills || e.dna.skills.length===0)) e.dna.skills = [getRandomSkill(e.dna.types)];
+        if(!e.area) e.area = 1; 
+    });
+    
     document.getElementById('login-overlay').classList.add('hidden');
     updateUI();renderList();checkDailyLogin();
-    setInterval(saveUserData,15000);
 }
-function save(){saveUserData();}
-function logout(){location.reload();}
-function updateUI(){
-    document.getElementById('coin-display').innerText=ud.coins;
-    document.getElementById('zoo-coins').innerText=ud.coins;
-    document.getElementById('more-username').innerText=currentUser||'Khách';
-    document.getElementById('more-learned').innerText=ud.data.filter(w=>w.status==='mastered').length;
-    renderIncubators();renderZooAreaSelect();
+function save(){if(currentUser){usersDB[currentUser]=ud;localStorage.setItem('vocaby_v4',JSON.stringify(usersDB))}}
+function logout(){location.reload()}
+function updateUI(){ document.getElementById('coin-display').innerText=ud.coins; document.getElementById('zoo-coins').innerText=ud.coins; document.getElementById('more-username').innerText=currentUser||'Khách'; renderZooAreaSelect(); }
+
+setInterval(() => {
+    if(!currentUser) return;
+    renderEgg(); checkAutoGrow(); updatePetDetailTimer();
+}, 1000);
+
+function checkAutoGrow() {
+    let grown = false; const GROW_TIME = 180000; 
+    ud.eco.collection.forEach(c => { if(c.stage === 'baby' && c.birthTime && Date.now() - c.birthTime >= GROW_TIME) { c.stage = 'adult'; grown = true; showToast(`🎉 Thú cưng <b class="rarity-${c.rarity}">${c.name}</b> trong Túi đồ đã trưởng thành!`); } });
+    ud.eco.entities.forEach(e => { if(e.dna && e.dna.stage === 'baby' && e.dna.birthTime && Date.now() - e.dna.birthTime >= GROW_TIME) { e.dna.stage = 'adult'; grown = true; showToast(`🎉 Thú cưng <b class="rarity-${e.dna.rarity}">${e.dna.name}</b> ở Sở Thú đã trưởng thành!`); } });
+    if(grown) { save(); if(document.getElementById('inv-modal').classList.contains('show')) renderInv('pet'); }
 }
 
-const LEVEL_COINS={A1:5,A2:10,B1:15,B2:25,C1:40,C2:60};
-
+/* ==========================================
+   AI & TỪ VỰNG
+   ========================================== */
 async function callAI(prompt){try{const r=await fetch(`https://text.pollinations.ai/${encodeURIComponent(prompt)}`);if(!r.ok)throw 0;return(await r.text()).trim()}catch(e){return null}}
 async function getDefinition(word){try{const r=await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);const d=await r.json();return d[0]?.meanings[0]?.definitions[0]?.definition||'No definition found.'}catch(e){return'Definition unavailable.'}}
 async function getAISuggestions(){
-    const topic=document.getElementById('aiTopic').value.trim()||'Daily life';
-    const st=document.getElementById('aiStatus');st.style.display='block';
-    const existing=ud.data.map(w=>w.word).join(', ');
-    const prompt=`Topic: "${topic}". List 8 English words NOT in [${existing}]. Format: "Word - Vietnamese meaning". No numbering. One per line.`;
+    const topic=document.getElementById('aiTopic').value.trim()||'Daily life'; document.getElementById('aiStatus').style.display='block';
+    const existing=ud.data.map(w=>w.word).join(', '); const prompt=`Topic: "${topic}". List 8 English words NOT in [${existing}]. Format: "Word - Vietnamese meaning". No numbering. One per line.`;
     try{const r=await fetch(`https://text.pollinations.ai/${encodeURIComponent(prompt)}`);let t=await r.text();t=t.split('\n').filter(l=>l.includes('-')).join('\n');document.getElementById('bulkInput').value=t.trim()}catch(e){alert('Lỗi AI')}
-    st.style.display='none';
+    document.getElementById('aiStatus').style.display='none';
 }
 async function chatWithAI(){
-    const input=document.getElementById('chatInput'),text=input.value.trim();if(!text)return;
-    appendMsg(text,'msg-user');input.value='';
-    const learned=ud.data.map(w=>w.word).join(', ');
-    const prompt=`You are a friendly English teacher. Reply to: "${text}" in English. Occasionally use these words naturally: ${learned}. Keep short & supportive.`;
-    try{const r=await fetch(`https://text.pollinations.ai/${encodeURIComponent(prompt)}`);typeWriter(await r.text())}catch(e){appendMsg('Lỗi kết nối AI!','msg-ai')}
+    const input=document.getElementById('chatInput'),text=input.value.trim();if(!text)return; appendMsg(text,'msg-user');input.value='';
+    const learned=ud.data.map(w=>w.word).join(', '); const prompt=`You are a friendly English teacher. Reply to: "${text}" in English. Occasionally use these words naturally: ${learned}. Keep short & supportive.`;
+    try{const r=await fetch(`https://text.pollinations.ai/${encodeURIComponent(prompt)}`);
+        const b=document.getElementById('chatBox'),d=document.createElement('div');d.className='msg msg-ai typing-cursor';d.innerText='';b.appendChild(d);
+        let textRes = await r.text(); let i=0;
+        const iv=setInterval(()=>{if(i<textRes.length){d.innerText+=textRes.charAt(i);i++;b.scrollTop=b.scrollHeight}else{clearInterval(iv);d.classList.remove('typing-cursor')}},22);
+    }catch(e){appendMsg('Lỗi kết nối AI!','msg-ai')}
 }
 function appendMsg(t,cls){const b=document.getElementById('chatBox'),d=document.createElement('div');d.className='msg '+cls;d.innerText=t;b.appendChild(d);b.scrollTop=b.scrollHeight}
-function typeWriter(text){const b=document.getElementById('chatBox'),d=document.createElement('div');d.className='msg msg-ai typing-cursor';d.innerText='';b.appendChild(d);let i=0;const iv=setInterval(()=>{if(i<text.length){d.innerText+=text.charAt(i);i++;b.scrollTop=b.scrollHeight}else{clearInterval(iv);d.classList.remove('typing-cursor')}},22)}
 
+const LEVEL_COINS={A1:10,A2:15,B1:20,B2:30,C1:50,C2:80};
 async function addBulkWords(){
-    const raw=document.getElementById('bulkInput').value.trim();
-    if(!raw)return alert('Nhập từ trước!');
-    let nw=[];
-    raw.split('\n').forEach(l=>{
-        const p=l.split(/[-–:]/);
-        if(p.length>=2){
-            const word=p[0].trim().replace(/^\d+\.\s*/,''),meaning=p[1].trim();
-            if(word&&meaning&&!ud.data.find(w=>w.word.toLowerCase()===word.toLowerCase()))
-                nw.push({word,meaning,definition:'',status:'learning',streak:0,cefr:'B1',customDef:false});
-        }
-    });
-    if(!nw.length)return alert('Không có từ mới!');
-    const cefrPrompt=`You are a Cambridge/Oxford lexicographer. Classify CEFR for each word. "dog"=A1,"cat"=A1,"environment"=B1,"ubiquitous"=C2. Return ONLY JSON: [{"word":"dog","cefr":"A1"}]. Words: ${nw.map(w=>w.word).join(', ')}`;
-    const cr=await callAI(cefrPrompt);
-    if(cr){try{const m=cr.match(/\[[\s\S]*?\]/);if(m)JSON.parse(m[0]).forEach(c=>{const f=nw.find(w=>w.word.toLowerCase()===c.word?.toLowerCase());if(f&&c.cefr)f.cefr=c.cefr.toUpperCase()})}catch(e){}}
-    for(let w of nw){w.definition=await getDefinition(w.word);}
-    ud.data.push(...nw);
-    document.getElementById('bulkInput').value='';
-    save();updateUI();renderList();
-    alert(`✅ Đã lưu ${nw.length} từ mới + tự động định nghĩa!`);
+    const raw=document.getElementById('bulkInput').value.trim(); if(!raw)return alert('Nhập từ trước!'); let nw=[];
+    raw.split('\n').forEach(l=>{ const p=l.split(/[-–:]/); if(p.length>=2){ const word=p[0].trim().replace(/^\d+\.\s*/,''),meaning=p.slice(1).join('-').trim(); if(word&&meaning&&!ud.data.find(w=>w.word.toLowerCase()===word.toLowerCase())) nw.push({word,meaning,definition:'',status:'learning',streak:0,cefr:'B1',customDef:false}); } });
+    if(!nw.length)return alert('Không có từ mới!'); document.getElementById('bulkInput').value='';
+    for(let w of nw) w.definition=await getDefinition(w.word); ud.data.push(...nw); save();updateUI();renderList(); showToast(`✅ Đã lưu ${nw.length} từ mới!`);
 }
 
 function renderList(){
     const el=document.getElementById('wordListContent'),empty=document.getElementById('empty-msg');
-    if(!ud.data.length){el.innerHTML='';empty.style.display='block';return}
-    empty.style.display='none';
-    el.innerHTML=ud.data.map((w,i)=>`
-        <div class="word-item">
-            <div class="wi-info">
-                <div class="wi-word">${w.word} <button onclick="speakWord('${w.word}');event.stopImmediatePropagation()" style="background:none;border:none;font-size:18px;cursor:pointer">🔊</button></div>
-                <div class="wi-meaning">${w.meaning}</div>
-                ${w.definition?`<div class="wi-def">${w.definition}</div>`:''}
-                <div class="wi-tags">
-                    <span class="tag cefr-${w.cefr||'B1'}">${w.cefr||'B1'}</span>
-                    <span class="tag ${w.status==='mastered'?'tag-mastered':'tag-learning'}">${w.status==='mastered'?'✅ Thuộc':'🔥 '+(w.streak||0)+'/3'}</span>
-                </div>
-            </div>
-            <div style="display:flex;gap:4px;flex-shrink:0">
-                <button class="btn-icon" style="width:32px;height:32px;font-size:14px" onclick="editWord(${i});event.stopImmediatePropagation()">✏️</button>
-                <button class="btn-icon" style="width:32px;height:32px;font-size:14px;border-color:var(--danger-light);color:var(--danger)" onclick="deleteWord(${i});event.stopImmediatePropagation()">🗑️</button>
-            </div>
-        </div>
-    `).join('');
-}
-function speakWord(word){const u=new SpeechSynthesisUtterance(word);u.lang='en-US';speechSynthesis.speak(u);}
-function editWord(i){
-    const w=ud.data[i];
-    const nm=prompt('Sửa nghĩa:',w.meaning);if(nm!==null&&nm.trim())w.meaning=nm.trim();
-    const nd=prompt('Sửa định nghĩa (chỉ ảnh hưởng từ này):',w.definition||'');
-    if(nd!==null){w.definition=nd.trim();w.customDef=true}
-    const nc=prompt('Sửa CEFR (A1/A2/B1/B2/C1/C2):',w.cefr||'B1');
-    if(nc&&['A1','A2','B1','B2','C1','C2'].includes(nc.toUpperCase()))w.cefr=nc.toUpperCase();
-    save();renderList();
+    if(!ud.data.length){el.innerHTML='';empty.style.display='block';return} empty.style.display='none';
+    el.innerHTML=ud.data.map((w,i)=>`<div class="word-item"><div class="wi-info"><div class="wi-word">${w.word}</div><div class="wi-meaning">${w.meaning}</div>${w.definition?`<div class="wi-def">${w.definition}</div>`:''}<div class="wi-tags"><span class="tag cefr-${w.cefr||'B1'}">${w.cefr||'B1'}</span><span class="tag ${w.status==='mastered'?'tag-mastered':'tag-learning'}">${w.status==='mastered'?'✅ Thuộc':'🔥 '+w.streak+'/3'}</span></div></div><div style="display:flex;gap:4px;flex-shrink:0"><button class="btn-icon" style="width:32px;height:32px;font-size:14px;border-color:var(--accent-light);color:var(--accent)" onclick="openEditWordModal(${i})">✏️</button><button class="btn-icon" style="width:32px;height:32px;font-size:14px;border-color:var(--danger-light);color:var(--danger)" onclick="deleteWord(${i})">🗑️</button></div></div>`).join('');
 }
 function deleteWord(i){if(confirm('Xóa?')){ud.data.splice(i,1);save();renderList()}}
 function deleteAllWords(){if(confirm('Xóa TẤT CẢ?')){ud.data=[];save();renderList()}}
 
-function gainXp(){ud.eco.xp++;if(ud.eco.xp>=3)ud.hatchStart=Date.now();save();updateUI()}
-function growCreature(){if(ud.coins<30)return alert('Cần 30 Xu!');ud.coins-=30;const a={...ud.eco.dna,stage:'adult'};ud.eco.collection.push(a);ud.eco.dna=genCreature();closeModal('hatch-modal');save();updateUI();alert('Đã nuôi lớn!')}
-function keepBaby(){ud.eco.collection.push({...ud.eco.dna});ud.eco.dna=genCreature();closeModal('hatch-modal');save();updateUI();alert('Đã cất vào Túi!')}
+/* HÀM SỬA TỪ VỰNG */
+function openEditWordModal(idx) {
+    const w = ud.data[idx];
+    document.getElementById('edit-word-idx').value = idx;
+    document.getElementById('edit-word-en').value = w.word;
+    document.getElementById('edit-word-vi').value = w.meaning;
+    document.getElementById('edit-word-def').value = w.definition || '';
+    document.getElementById('edit-word-cefr').value = w.cefr || 'B1';
+    openModal('edit-word-modal');
+}
+function saveEditedWord() {
+    const idx = parseInt(document.getElementById('edit-word-idx').value);
+    const en = document.getElementById('edit-word-en').value.trim();
+    const vi = document.getElementById('edit-word-vi').value.trim();
+    const def = document.getElementById('edit-word-def').value.trim();
+    const cefr = document.getElementById('edit-word-cefr').value;
 
-// ==========================================
-// LÒ ẤP CẢI TIẾN (thanh + thời gian)
-// ==========================================
-function renderIncubators(){
-    const container = document.getElementById('incubator-list');
-    container.innerHTML = '';
-    ud.eco.incubators.forEach((inc,i)=>{
-        const div = document.createElement('div');
-        div.className = `incubator-slot ${inc.dna?'filled':''}`;
-        if(inc.dna && inc.startTime){
-            const elapsed = Date.now() - inc.startTime;
-            const percent = Math.min(100, Math.floor((elapsed / inc.baseDuration)*100));
-            const leftSec = Math.max(0, Math.ceil((inc.baseDuration - elapsed)/1000));
-            div.innerHTML = `
-                <div style="font-size:32px">${inc.dna.e}</div>
-                <div style="font-size:13px;font-weight:700;">${inc.dna.name}</div>
-                <div class="progress-bar"><div class="progress-fill" style="width:${percent}%"></div></div>
-                <div class="inc-timer">⏳ ${leftSec} giây</div>
-            `;
-        }else{
-            div.innerHTML = `<span style="font-size:28px">🥚</span><br><small>Trống</small>`;
-        }
-        container.appendChild(div);
-    });
-    document.getElementById('incubator-count').innerText=ud.eco.incubators.length;
+    if(!en || !vi) return showToast('Vui lòng nhập đủ từ và nghĩa!');
+
+    ud.data[idx].word = en;
+    ud.data[idx].meaning = vi;
+    ud.data[idx].definition = def;
+    ud.data[idx].cefr = cefr;
+
+    save();
+    renderList();
+    closeModal('edit-word-modal');
+    showToast('✅ Đã cập nhật từ vựng!');
 }
 
-function buyIncubatorSlot(){
-    if(ud.coins<200)return alert('Cần 200 Xu!');
-    ud.coins-=200;
-    ud.eco.incubators.push({id:ud.eco.incubators.length+1,dna:null,startTime:null,baseDuration:60000});
-    save();updateUI();renderIncubators();
-    alert('✅ Mua thêm lò ấp thành công!');
-}
-function assignEggToIncubator(newEgg){
-    const free=ud.eco.incubators.find(i=>!i.dna);
-    if(free){
-        free.dna=newEgg;
-        free.startTime=Date.now();
-        free.baseDuration=newEgg.rarity==='common'?60000:newEgg.rarity==='rare'?120000:newEgg.rarity==='ultra'?180000:newEgg.rarity==='legendary'?300000:600000;
-        save();updateUI();
+/* ==========================================
+   LỒNG ẤP TRỨNG
+   ========================================== */
+function renderEgg(){
+    const c=document.getElementById('egg-canvas');if(!c)return;
+    const ctx=c.getContext('2d');ctx.clearRect(0,0,80,80);
+    if(ud.eco.xp<3){
+        const colors={common:'#fbbf24',rare:'#3b82f6',epic:'#a855f7',legendary:'#f59e0b',mythic:'#ef4444'};
+        ctx.fillStyle=colors[ud.eco.dna?.rarity]||'#fbbf24'; ctx.beginPath();ctx.ellipse(40,42,18,24,0,0,Math.PI*2);ctx.fill(); ctx.fillStyle='rgba(255,255,255,0.35)';ctx.beginPath();ctx.ellipse(34,34,5,8,-0.3,0,Math.PI*2);ctx.fill(); c.classList.add('anim-egg'); document.getElementById('eco-name').innerHTML=`Trứng <span class="rarity-${ud.eco.dna?.rarity}">${(ud.eco.dna?.rarity||'thường').toUpperCase()}</span>`;
     }else{
-        ud.eco.collection.push({...newEgg,stage:'baby'});
-        alert('Đã hết lò ấp! Trứng được chuyển vào Túi Đồ.');
-        save();updateUI();
+        ctx.font='48px serif';ctx.textAlign='center';ctx.textBaseline='middle'; ctx.fillText(ud.eco.dna?.e||'🥚',40,40); c.classList.remove('anim-egg'); document.getElementById('eco-name').innerHTML=`<span class="rarity-${ud.eco.dna?.rarity}">Sẵn sàng nở!</span>`;
     }
+    document.getElementById('eco-progress').style.width=(ud.eco.xp/3*100)+'%'; const timer=document.getElementById('hatch-timer');
+    if(ud.hatchStart){ const left=Math.max(0,60000-(Date.now()-ud.hatchStart)); timer.innerHTML=left>0?`⏰ Nở sau: <b>${Math.ceil(left/1000)}s</b>`:`✅ <b>Sẵn sàng nở!</b>`; }else{ document.getElementById('xp-needed').innerText=3-ud.eco.xp; timer.innerHTML=`Học <b>${3-ud.eco.xp}</b> từ để nở`; }
 }
-setInterval(()=>{
-    ud.eco.incubators.forEach((inc,i)=>{
-        if(inc.dna&&inc.startTime){
-            const elapsed=Date.now()-inc.startTime;
-            if(elapsed>=inc.baseDuration){
-                ud.coins+=10;
-                ud.eco.dna = inc.dna; // set temp dna cho dialog nở
-                document.getElementById('hatch-title').innerText=inc.dna.name;
-                document.getElementById('hatch-img-wrap').innerHTML=`<img src="${inc.dna.imgUrl}" style="width:120px;height:120px;border-radius:16px;border:2px solid var(--border)">`;
-                openModal('hatch-modal');
-                inc.dna=null;inc.startTime=null;
-                save();updateUI();
-            }
-        }
-    });
-    renderIncubators();
-    if(document.getElementById('shop-modal').classList.contains('show')) {
-        // Cập nhật lại shop nếu đang mở để update timer tăng tốc lò
-        renderShop();
-    }
-},1000);
+function hatchEgg(){
+    if(ud.eco.xp<3)return showToast(`Cần học thêm ${3-ud.eco.xp} từ!`); if(!ud.hatchStart){ud.hatchStart=Date.now();save();updateUI();showToast('Bắt đầu ấp! Đợi 1 phút...');return} if(Date.now()-ud.hatchStart<60000) return;
+    ud.eco.xp=0;ud.hatchStart=null;ud.coins+=10; ud.eco.dna.birthTime = Date.now(); 
+    document.getElementById('hatch-title').innerHTML=`<span class="rarity-${ud.eco.dna.rarity}">${ud.eco.dna.name}</span>`; document.getElementById('hatch-img-wrap').innerHTML=`<img src="${ud.eco.dna.imgUrl}" style="width:120px;height:120px;border-radius:16px;border:2px solid var(--border)">`; document.getElementById('hatch-types').innerHTML = renderTypeBadges(ud.eco.dna.types);
+    openModal('hatch-modal');save();updateUI();
+}
+function keepBaby(){ ud.eco.collection.push({...ud.eco.dna}); ud.eco.dna=genCreature(); closeModal('hatch-modal');save();updateUI(); showToast('Đã cất bé vào Túi Đồ!'); }
 
+/* ==========================================
+   TÚI ĐỒ & HUẤN LUYỆN THÚ
+   ========================================== */
 function renderInv(tab,el){
-    document.querySelectorAll('#inv-tabs .tab').forEach(t=>t.classList.remove('active'));
-    if(el)el.classList.add('active');
+    document.querySelectorAll('#inv-tabs .tab').forEach(t=>t.classList.remove('active')); if(el)el.classList.add('active');
     const g=document.getElementById('inv-grid');
     if(tab==='pet'){
         if(!ud.eco.collection.length){g.innerHTML='<p style="text-align:center;color:var(--text3);grid-column:1/-1">Túi rỗng</p>';return}
         g.innerHTML=ud.eco.collection.map((c,i)=>`
-            <div class="grid-item" onclick="invAction(${i})">
+            <div class="grid-item" onclick="openPetActionModal('col', ${i})">
                 <img src="${c.imgUrl}" style="width:60px;height:60px;border-radius:10px;object-fit:cover" loading="lazy">
-                <div class="gi-name">${c.name}</div>
-                <div class="gi-sub">${c.stage} • ${c.rarity}</div>
+                <div class="gi-name rarity-${c.rarity}">${c.name}</div>
+                <div class="type-badges">${renderTypeBadges(c.types)}</div>
+                <div class="gi-sub" style="margin-top: 4px;">Lv.${c.level||1} • ${c.stage==='baby'?'🍼':'⭐'}</div>
             </div>
         `).join('');
     }else g.innerHTML='<p style="text-align:center;color:var(--text3);grid-column:1/-1">Chưa có vật phẩm</p>';
 }
-function invAction(i){
-    const c=ud.eco.collection[i];
-    if(c.stage==='baby'){
-        if(confirm(`Nuôi lớn ${c.name}? (30 Xu)`)){if(ud.coins>=30){ud.coins-=30;c.stage='adult';save();updateUI();renderInv('pet')}else alert('Thiếu tiền!')}}
-    else{if(confirm(`Thả ${c.name} vào Sở Thú?`)){ud.eco.entities.push({x:50+Math.random()*300,y:200+Math.random()*100,dna:c,dx:0,dy:0});ud.eco.collection.splice(i,1);save();renderInv('pet');alert('Đã thả!')}}}
+
+let selectedPetType = ''; let selectedPetIdx = -1;
+
+function renderPetSkills(p) {
+    const el = document.getElementById('pd-skills');
+    el.innerHTML = (p.skills||[]).map(s => {
+        const tInfo = TYPES[s.type] || TYPES.Normal;
+        return `<div style="background:${tInfo.c};color:#fff;font-size:10px;padding:4px;border-radius:8px;text-shadow:0 1px 1px rgba(0,0,0,0.5)"><b>${s.name}</b> (Uy lực: ${s.pwr})</div>`;
+    }).join('');
+}
+
+function openPetActionModal(type, idx) {
+    selectedPetType = type; selectedPetIdx = idx;
+    const p = type === 'col' ? ud.eco.collection[idx] : ud.eco.entities[idx].dna;
+    
+    document.getElementById('pd-img').src = p.imgUrl;
+    document.getElementById('pd-name').innerHTML = `<span class="rarity-${p.rarity}">${p.name}</span>`;
+    document.getElementById('pd-type-badges').innerHTML = renderTypeBadges(p.types);
+    
+    const stats = getPetStats(p);
+    document.getElementById('pd-lvl').innerText = p.level;
+    document.getElementById('pd-pwr').innerText = stats.pwr;
+    document.getElementById('pd-age-status').innerText = stats.status;
+    
+    renderPetSkills(p);
+    
+    const btnPet = document.getElementById('pd-btn-pet'); const btnGrow = document.getElementById('pd-btn-grow');
+    const btnRelease = document.getElementById('pd-btn-release'); const btnRecall = document.getElementById('pd-btn-recall');
+    const txtGrow = document.getElementById('pd-grow-time');
+    
+    btnPet.style.display = 'none'; btnGrow.style.display = 'none'; btnRelease.style.display = 'none'; btnRecall.style.display = 'none'; txtGrow.style.display = 'none';
+    
+    if(type === 'col') {
+        btnRelease.style.display = 'block';
+        if(p.stage === 'baby') { btnGrow.style.display = 'block'; txtGrow.style.display = 'block'; updatePetDetailTimer(); }
+    } else if (type === 'zoo') {
+        btnRecall.style.display = 'block'; btnPet.style.display = 'block';
+        if(Date.now() - (p.lastPetTime||0) > 30000) { btnPet.disabled = false; btnPet.innerHTML = '❤️ Vuốt ve (+2 Xu)'; } else { btnPet.disabled = true; btnPet.innerHTML = '⏳ Đang vui vẻ'; }
+        if(p.stage === 'baby') { btnGrow.style.display = 'block'; txtGrow.style.display = 'block'; updatePetDetailTimer(); }
+    }
+    
+    document.getElementById('pd-btn-sell').innerText = `💰 Bán lấy ${getSellPrice(p.rarity)} Xu`;
+    openModal('pet-detail-modal');
+}
+
+function updatePetDetailTimer() {
+    if(!document.getElementById('pet-detail-modal').classList.contains('show') || selectedPetIdx === -1) return;
+    const p = selectedPetType === 'col' ? ud.eco.collection[selectedPetIdx] : ud.eco.entities[selectedPetIdx].dna;
+    if(p && p.stage === 'baby') {
+        const left = 180000 - (Date.now() - p.birthTime);
+        if(left > 0) document.getElementById('pd-grow-time').innerText = `⏳ Tự lớn sau: ${Math.ceil(left/1000)}s`;
+        else document.getElementById('pd-grow-time').innerText = `✨ Đã sẵn sàng tiến hóa...`;
+    }
+}
+
+// HUẤN LUYỆN / HỌC CHIÊU
+let pendingSkill = null;
+function btnActionTrain() {
+    if(ud.coins < 5) return showToast('Cần 5 Xu để huấn luyện!');
+    ud.coins -= 5;
+    
+    const p = selectedPetType === 'col' ? ud.eco.collection[selectedPetIdx] : ud.eco.entities[selectedPetIdx].dna;
+    p.ageTicks++; p.level++; 
+    if(p.stage === 'baby' && p.ageTicks >= 5) p.stage = 'adult';
+    
+    showToast(`🍖 Đã cho ăn! ${p.name} tăng lên Lv.${p.level}. PWR hiện tại: ${getPetStats(p).pwr}`);
+    
+    // Tỉ lệ học chiêu thức mới (20% mỗi lần lên cấp)
+    if(Math.random() < 0.2) {
+        const randomType = p.types[Math.floor(Math.random()*p.types.length)];
+        const pool = SKILL_POOL[randomType] || SKILL_POOL.Normal;
+        // Chiêu lấy ngẫu nhiên (tỉ lệ cao ra chiêu mạnh hơn)
+        const newSkillObj = pool[Math.floor(Math.random()*pool.length)];
+        const s = { name: newSkillObj.n, pwr: newSkillObj.p, type: randomType };
+        
+        if(!p.skills.find(x => x.name === s.name)) {
+            if(p.skills.length < 4) {
+                p.skills.push(s); showToast(`🎉 Cực sốc! ${p.name} tự ngộ ra tuyệt kỹ [${s.name}]!`);
+            } else {
+                pendingSkill = s;
+                document.getElementById('sr-new-skill').innerText = s.name;
+                document.getElementById('sr-skill-list').innerHTML = p.skills.map((old, i) => `
+                    <button class="btn btn-danger" onclick="replaceSkill(${i})" style="font-size:12px;display:flex;justify-content:space-between">
+                        <span>Bỏ ${old.name}</span> <span style="opacity:0.8">Pwr: ${old.pwr}</span>
+                    </button>
+                `).join('');
+                closeModal('pet-detail-modal'); openModal('skill-replace-modal');
+            }
+        }
+    }
+    
+    save(); updateUI(); if(selectedPetType==='col') renderInv('pet');
+    if(document.getElementById('pet-detail-modal').classList.contains('show')) openPetActionModal(selectedPetType, selectedPetIdx);
+}
+
+function replaceSkill(idx) {
+    const p = selectedPetType === 'col' ? ud.eco.collection[selectedPetIdx] : ud.eco.entities[selectedPetIdx].dna;
+    p.skills[idx] = pendingSkill; save(); closeModal('skill-replace-modal');
+    showToast(`🧠 Đã quên chiêu cũ và học thành công [${pendingSkill.name}]!`);
+}
+function cancelLearnSkill() { closeModal('skill-replace-modal'); showToast('Đã từ chối học chiêu mới.'); }
+
+
+function btnActionGrow() {
+    if(ud.coins < 30) return showToast('Không đủ 30 Xu!'); ud.coins -= 30;
+    const p = selectedPetType === 'col' ? ud.eco.collection[selectedPetIdx] : ud.eco.entities[selectedPetIdx].dna;
+    p.stage = 'adult'; save(); updateUI(); if(selectedPetType==='col') renderInv('pet'); openPetActionModal(selectedPetType, selectedPetIdx); showToast('✨ Thú cưng đã trưởng thành!');
+}
+function btnActionRelease() {
+    const p = ud.eco.collection[selectedPetIdx]; ud.eco.entities.push({x:50+Math.random()*200, y:150+Math.random()*100, dna:p, dx:0, dy:0, area: ud.eco.currentArea});
+    ud.eco.collection.splice(selectedPetIdx,1); save(); renderInv('pet'); closeModal('pet-detail-modal'); showToast(`🏕️ Thả <b>${p.name}</b> vào Vườn thành công!`);
+}
+function btnActionRecall() {
+    const e = ud.eco.entities[selectedPetIdx]; ud.eco.collection.push(e.dna); ud.eco.entities.splice(selectedPetIdx, 1);
+    save(); closeModal('pet-detail-modal'); showToast('🎒 Đã thu hồi thú về túi đồ!');
+}
+function btnActionRename() {
+    const p = selectedPetType === 'col' ? ud.eco.collection[selectedPetIdx] : ud.eco.entities[selectedPetIdx].dna; const nn = prompt('Nhập tên mới:', p.name);
+    if(nn && nn.trim()) { p.name = nn.trim(); save(); if(selectedPetType==='col') renderInv('pet'); openPetActionModal(selectedPetType, selectedPetIdx); showToast('✏️ Đổi tên thành công!'); }
+}
+function btnActionSell() {
+    const p = selectedPetType === 'col' ? ud.eco.collection[selectedPetIdx] : ud.eco.entities[selectedPetIdx].dna;
+    if(confirm(`Bạn có chắc muốn chia tay ${p.name} và nhận ${getSellPrice(p.rarity)} Xu?`)) {
+        ud.coins += getSellPrice(p.rarity); if(selectedPetType==='col') ud.eco.collection.splice(selectedPetIdx,1); else ud.eco.entities.splice(selectedPetIdx,1);
+        save(); updateUI(); if(selectedPetType==='col') renderInv('pet'); closeModal('pet-detail-modal'); showToast(`💸 Đã bán ${p.name}!`);
+    }
+}
+function btnActionPet() {
+    const e = ud.eco.entities[selectedPetIdx];
+    if(Date.now() - (e.dna.lastPetTime||0) > 30000) {
+        e.dna.lastPetTime = Date.now(); ud.coins += 2; floatingTexts.push({x: e.x, y: e.y, text: "+2🪙 ❤️", life: 50, c: '#ef4444'});
+        save(); updateUI(); closeModal('pet-detail-modal'); showToast('❤️ Đã vuốt ve thú cưng!');
+    }
+}
 
 function openInvForZoo(){
-    const pets=ud.eco.collection.filter(c=>c.stage==='adult');
-    if(!pets.length)return alert('Cần thú trưởng thành trong Túi Đồ!');
-    openPetSelectModal('release');
+    if(!ud.eco.collection.length) return showToast('Túi đồ của bạn đang trống!');
+    document.getElementById('pet-select-grid').innerHTML = ud.eco.collection.map((p, i) => `<div class="grid-item" onclick="directReleasePet(${i})"><img src="${p.imgUrl}"><div class="gi-name rarity-${p.rarity}">${p.name}</div><div class="type-badges">${renderTypeBadges(p.types)}</div><div class="gi-sub" style="margin-top:4px">${p.stage==='baby'?'🍼 Baby':'⭐ Adult'}</div></div>`).join('');
+    document.getElementById('pet-select-title').innerText = "Chọn Thú Để Thả"; openModal('pet-select-modal');
 }
-function feedAll(){
-    if(!ud.eco.entities.length)return alert('Sở thú trống!');
-    if(ud.coins<5)return alert('Cần 5 Xu!');
-    ud.coins-=5;save();updateUI();alert('Đã cho ăn! 🍖');
+function directReleasePet(idx){
+    const p = ud.eco.collection[idx]; ud.eco.entities.push({x:50+Math.random()*200, y:150+Math.random()*100, dna:p, dx:0, dy:0, area: ud.eco.currentArea});
+    ud.eco.collection.splice(idx,1); save(); closeModal('pet-select-modal'); showToast(`🏕️ Đã thả ${p.name} vào Sở Thú!`);
 }
 
-// ==========================================
-// CỬA HÀNG + THÔNG TIN LÒ ẤP
-// ==========================================
-const SHOP=[{name:'Gacha Thường',price:10,type:'gacha_c',icon:'📦'},{name:'Gacha HIẾM',price:50,type:'gacha_r',icon:'🔥'},{name:'Gacha ULTRA',price:120,type:'gacha_u',icon:'💎'},{name:'Gacha LEGEND',price:250,type:'gacha_l',icon:'⭐'},{name:'Gacha MYTHIC',price:800,type:'gacha_m',icon:'🌌'},{name:'Lò Ấp Thêm',price:200,type:'incubator',icon:'🥚'},{name:'Pokeball x10',price:30,type:'pokeball',icon:'🎾'},{name:'Thức Ăn Siêu',price:25,type:'food',icon:'🍖'},{name:'Tăng XP',price:30,type:'xp',icon:'⚡'},{name:'Giảm Thời Gian Ấp',price:80,type:'speed',icon:'⏩'}];
+/* ==========================================
+   PVP 1VS1 (3 PETS) SYSTEM
+   ========================================== */
+let pvpTeam = [];
+let battleState = null;
 
-function renderShop(){
-    let html = SHOP.map((s,i)=>`<div class="grid-item" onclick="buyItem(${i})"><div class="gi-icon">${s.icon}</div><div class="gi-name">${s.name}</div><div class="gi-price">${s.price} Xu</div></div>`).join('');
+function openPVPSetup() {
+    const validPets = ud.eco.collection.filter(p => p.stage === 'adult');
+    if(validPets.length < 3) return alert('Bạn cần ít nhất 3 thú trưởng thành (Adult) trong túi đồ để tham gia PVP!');
     
-    let incHtml = `<div style="margin-top:20px;border-top:2px solid var(--border);padding-top:15px"><h3 style="margin-bottom:10px">🔥 Lò đang ấp</h3>`;
-    let hasActive = false;
-    ud.eco.incubators.forEach((inc,i)=>{
-        if(inc.dna && inc.startTime){
-            hasActive = true;
-            const left = Math.max(0, Math.ceil((inc.baseDuration - (Date.now()-inc.startTime))/1000));
-            incHtml += `
-                <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px">
-                    <div style="display:flex;justify-content:space-between;font-weight:700">
-                        <span>${inc.dna.name}</span>
-                        <span style="color:var(--danger)">${left}s</span>
-                    </div>
-                    <button class="btn btn-primary btn-sm" style="width:100%;margin-top:8px" onclick="speedUpIncubator(${i})">Tăng tốc (-50 Xu)</button>
-                </div>`;
+    pvpTeam = []; document.getElementById('pvp-room-code').value = '';
+    
+    document.getElementById('pvp-team-grid').innerHTML = validPets.map((p, i) => `
+        <div class="grid-item" id="pvp-sel-${i}" onclick="togglePvpPet(${i})">
+            <img src="${p.imgUrl}">
+            <div class="gi-name rarity-${p.rarity}">${p.name}</div>
+            <div class="gi-sub" style="color:red;font-weight:bold;margin-top:2px">PWR: ${getPetStats(p).pwr}</div>
+        </div>
+    `).join('');
+    
+    openModal('pvp-setup-modal');
+}
+
+function togglePvpPet(idx) {
+    const el = document.getElementById(`pvp-sel-${idx}`);
+    if(pvpTeam.includes(idx)) {
+        pvpTeam = pvpTeam.filter(id => id !== idx); el.classList.remove('selected');
+    } else {
+        if(pvpTeam.length >= 3) return showToast('Chỉ được chọn tối đa 3 thú!');
+        pvpTeam.push(idx); el.classList.add('selected');
+    }
+}
+
+function startPVPBattle() {
+    if(pvpTeam.length !== 3) return showToast('Vui lòng chọn đủ 3 thú cưng!');
+    
+    const validPets = ud.eco.collection.filter(p => p.stage === 'adult');
+    const myPets = pvpTeam.map(idx => JSON.parse(JSON.stringify(validPets[idx])));
+    
+    myPets.forEach(p => { p.maxHp = getPetStats(p).pwr * 5; p.hp = p.maxHp; p.atk = getPetStats(p).pwr; });
+
+    const avgPwr = myPets.reduce((sum, p) => sum + p.atk, 0) / 3;
+    const aiPets = [];
+    for(let i=0; i<3; i++) {
+        const baseClass = Object.keys(CREATURES)[Math.floor(Math.random()*5)];
+        const aiPet = genCreature(baseClass);
+        aiPet.stage = 'adult';
+        aiPet.level = Math.max(1, Math.floor(avgPwr / 15) + Math.floor((Math.random()-0.5)*5));
+        aiPet.skills = []; for(let j=0; j<4; j++) aiPet.skills.push(getRandomSkill(aiPet.types));
+        aiPet.maxHp = (avgPwr + (Math.random()-0.5)*50) * 5; aiPet.hp = aiPet.maxHp; aiPet.atk = avgPwr + (Math.random()-0.5)*50;
+        aiPets.push(aiPet);
+    }
+
+    battleState = {
+        p1: { name: currentUser || 'Người chơi', pets: myPets, activeIdx: 0 },
+        p2: { name: 'AI Trainer ' + (document.getElementById('pvp-room-code').value.toUpperCase() || 'Bot'), pets: aiPets, activeIdx: 0 },
+        turn: 'p1'
+    };
+
+    closeModal('pvp-setup-modal');
+    document.getElementById('pvp-log').innerHTML = '<p class="log-p">⚔️ TRẬN ĐẤU BẮT ĐẦU!</p>';
+    updateBattleUI(); openModal('pvp-battle-modal');
+}
+
+function updateBattleUI() {
+    const p1 = battleState.p1.pets[battleState.p1.activeIdx];
+    const p2 = battleState.p2.pets[battleState.p2.activeIdx];
+    
+    document.getElementById('pvp-p1-img').src = p1.imgUrl; document.getElementById('pvp-p1-name').innerText = p1.name;
+    document.getElementById('pvp-p1-hp').style.width = (Math.max(0, p1.hp) / p1.maxHp * 100) + '%';
+    
+    document.getElementById('pvp-p2-img').src = p2.imgUrl; document.getElementById('pvp-p2-name').innerText = p2.name;
+    document.getElementById('pvp-p2-hp').style.width = (Math.max(0, p2.hp) / p2.maxHp * 100) + '%';
+
+    const skillContainer = document.getElementById('pvp-skills-container');
+    if(battleState.turn === 'p1' && p1.hp > 0) {
+        skillContainer.innerHTML = p1.skills.map((s, i) => {
+            const tInfo = TYPES[s.type] || TYPES.Normal;
+            let effText = ''; const mult = getEffectiveness(s.type, p2.types);
+            if(mult > 1) effText = '🔥 Siêu hiệu quả!'; else if(mult < 1 && mult > 0) effText = '🔻 Kháng cự'; else if(mult === 0) effText = '❌ Vô tác dụng';
+            return `<button class="pvp-skill-btn" style="background-color:${tInfo.c}" onclick="useSkill(${i})"><span style="font-size:14px">${s.name}</span><span style="font-size:10px; opacity:0.9">${tInfo.i} ${tInfo.vn} | Pwr: ${s.pwr}</span>${effText ? `<span style="font-size:10px; color:#fff000">${effText}</span>` : ''}</button>`;
+        }).join('');
+    } else {
+        skillContainer.innerHTML = `<div style="text-align:center;color:#cbd5e1;padding:20px;grid-column:1/-1">⏳ Đối thủ đang suy nghĩ...</div>`;
+    }
+
+    // Render Team Roster
+    const rosterContainer = document.getElementById('pvp-team-roster');
+    if(rosterContainer) {
+        rosterContainer.innerHTML = battleState.p1.pets.map((p, idx) => {
+            const isDead = p.hp <= 0;
+            const isActive = idx === battleState.p1.activeIdx;
+            const opacity = isDead ? '0.3' : (isActive ? '1' : '0.7');
+            const border = isActive ? '2px solid #22c55e' : '2px solid transparent';
+            const cursor = (isDead || isActive || battleState.turn !== 'p1') ? 'not-allowed' : 'pointer';
+
+            return `<div style="text-align:center; opacity:${opacity}; cursor:${cursor}; transition:0.2s" onclick="${(!isDead && !isActive && battleState.turn === 'p1') ? `switchPvpPet(${idx})` : ''}" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                <img src="${p.imgUrl}" style="width:40px; height:40px; border-radius:8px; object-fit:cover; border:${border}; background:#0f172a;">
+                <div style="font-size:10px; color:#fff; width:44px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:2px">${p.name}</div>
+                <div style="height:4px; width:40px; background:#475569; border-radius:2px; margin:2px auto 0; overflow:hidden;">
+                    <div style="height:100%; width:${Math.max(0, p.hp)/p.maxHp*100}%; background:${isDead?'#f43f5e':'#22c55e'}"></div>
+                </div>
+            </div>`;
+        }).join('');
+    }
+}
+
+function switchPvpPet(idx) {
+    if(battleState.turn !== 'p1') return;
+    const newPet = battleState.p1.pets[idx];
+    if(newPet.hp <= 0) return;
+
+    logBattle(`<span style="color:#38bdf8">▶ Bạn rút thú về và tung <b>${newPet.name}</b> ra sân!</span>`);
+    battleState.p1.activeIdx = idx;
+
+    // Đổi thú sẽ tốn 1 lượt đánh
+    battleState.turn = 'p2';
+    updateBattleUI();
+    setTimeout(aiTurn, 1000);
+}
+
+function logBattle(msg) { const logEl = document.getElementById('pvp-log'); logEl.innerHTML += `<p>${msg}</p>`; logEl.scrollTop = logEl.scrollHeight; }
+
+function useSkill(skillIdx) {
+    if(battleState.turn !== 'p1') return;
+    const p1Pet = battleState.p1.pets[battleState.p1.activeIdx]; const p2Pet = battleState.p2.pets[battleState.p2.activeIdx];
+    executeAttack(p1Pet, p2Pet, p1Pet.skills[skillIdx], true);
+}
+
+function executeAttack(atkPet, defPet, skill, isPlayer) {
+    document.getElementById('pvp-skills-container').innerHTML = '';
+    logBattle(`<span style="color:${isPlayer?'#38bdf8':'#f43f5e'}">▶ ${atkPet.name}</span> dùng <b>${skill.name}</b>!`);
+    
+    setTimeout(() => {
+        const typeMult = getEffectiveness(skill.type, defPet.types);
+        const stab = atkPet.types.includes(skill.type) ? 1.5 : 1; 
+        const isCrit = Math.random() < 0.1;
+        
+        let dmg = Math.floor((skill.pwr * (atkPet.atk / defPet.atk) * 0.8 + 10) * typeMult * stab);
+        if(isCrit) dmg = Math.floor(dmg * 1.5);
+        
+        if(typeMult > 1) logBattle(`<span style="color:#22c55e">💥 Đòn đánh siêu hiệu quả! (x${typeMult})</span>`);
+        if(typeMult < 1 && typeMult > 0) logBattle(`<span style="color:#94a3b8">🔻 Không hiệu quả lắm... (x${typeMult})</span>`);
+        if(typeMult === 0) logBattle(`❌ Chiêu thức vô tác dụng!`);
+        if(isCrit) logBattle(`<span class="log-crit">✨ Chí mạng!</span>`);
+        
+        defPet.hp -= dmg; logBattle(`Gây ra <b>${Math.max(0, dmg)}</b> sát thương!`);
+        updateBattleUI();
+        
+        setTimeout(() => {
+            if(defPet.hp <= 0) {
+                logBattle(`💀 <b>${defPet.name}</b> đã gục ngã!`); handleFaint(isPlayer ? 'p2' : 'p1');
+            } else {
+                battleState.turn = isPlayer ? 'p2' : 'p1';
+                if(battleState.turn === 'p2') setTimeout(aiTurn, 1000); else updateBattleUI();
+            }
+        }, 1000);
+    }, 1000);
+}
+
+function aiTurn() {
+    if(battleState.turn !== 'p2') return;
+    const aiPet = battleState.p2.pets[battleState.p2.activeIdx]; const p1Pet = battleState.p1.pets[battleState.p1.activeIdx];
+    executeAttack(aiPet, p1Pet, aiPet.skills[Math.floor(Math.random() * aiPet.skills.length)], false);
+}
+
+function handleFaint(faintedTeamStr) {
+    const team = battleState[faintedTeamStr];
+    // Tìm thú còn sống tiếp theo
+    let nextAliveIdx = -1;
+    for(let i = 0; i < team.pets.length; i++) {
+        if(team.pets[i].hp > 0) {
+            nextAliveIdx = i;
+            break;
         }
-    });
-    incHtml += `</div>`;
-    
-    document.getElementById('shop-grid').innerHTML = html;
-    document.getElementById('active-incubators').innerHTML = hasActive ? incHtml : '';
+    }
+
+    if(nextAliveIdx === -1) {
+        if(faintedTeamStr === 'p2') {
+            logBattle(`<span style="color:#22c55e;font-size:16px;font-weight:bold">🎉 BẠN ĐÃ CHIẾN THẮNG!</span>`);
+            const reward = 50 + Math.floor(Math.random()*50); ud.coins += reward; save(); updateUI();
+            logBattle(`Nhận được <b>${reward} Xu</b> tiền thưởng!`);
+        } else {
+            logBattle(`<span style="color:#f43f5e;font-size:16px;font-weight:bold">💀 TOÀN ĐỘI BỊ HẠ GỤC. BẠN ĐÃ THUA!</span>`);
+        }
+        document.getElementById('pvp-skills-container').innerHTML = `<button class="btn btn-primary" onclick="closeModal('pvp-battle-modal')" style="grid-column:1/-1;padding:15px;font-size:16px">Thoát Đấu Trường</button>`;
+    } else {
+        team.activeIdx = nextAliveIdx;
+        logBattle(`🔁 Đưa ra thú tiếp theo: <b>${team.pets[team.activeIdx].name}</b>!`);
+        battleState.turn = faintedTeamStr === 'p1' ? 'p2' : 'p1';
+        setTimeout(() => { updateBattleUI(); if(battleState.turn === 'p2') setTimeout(aiTurn, 1000); }, 1000);
+    }
 }
 
-function speedUpIncubator(i){
-    const inc = ud.eco.incubators[i];
-    if(!inc || !inc.dna || ud.coins < 50) return alert('Không đủ Xu hoặc lò trống!');
-    ud.coins -= 50;
-    inc.startTime -= 30000; // Cập nhật lại logic trừ startTime để đẩy nhanh tiến độ (tương đương với giảm 30 giây thời gian chờ)
-    save(); updateUI(); renderShop(); renderIncubators();
-    alert('✅ Đã tăng tốc lò ấp 30 giây!');
-}
-
+/* ==========================================
+   SHOP - GACHA
+   ========================================== */
+const SHOP=[ {name:'Gacha Thường',price:10,type:'gacha_c',icon:'📦'}, {name:'Gacha HIẾM',price:50,type:'gacha_r',icon:'🔥'}, {name:'Gacha SỬ THI',price:150,type:'gacha_e',icon:'💎'}, {name:'Gacha HUYỀN THOẠI',price:500,type:'gacha_l',icon:'👑'} ];
+function renderShop(){document.getElementById('shop-grid').innerHTML=SHOP.map((s,i)=>`<div class="grid-item" onclick="buyItem(${i})"><div class="gi-icon">${s.icon}</div><div class="gi-name">${s.name}</div><div class="gi-price">${s.price} Xu</div></div>`).join('')}
 function buyItem(i){
-    const s=SHOP[i];if(ud.coins<s.price)return alert('Thiếu tiền!');
-    ud.coins-=s.price;
+    const s=SHOP[i];if(ud.coins<s.price)return alert('Thiếu tiền!'); ud.coins-=s.price;
     if(s.type.includes('gacha')){
-        const r=s.type==='gacha_m'?'mythic':s.type==='gacha_l'?'legendary':s.type==='gacha_u'?'ultra':s.type==='gacha_r'?'rare':'common';
-        const c=genCreature(r);assignEggToIncubator(c);alert(`Mở ra: ${c.name} (${c.rarity})!`);
-    }else if(s.type==='xp'){ud.eco.xp=Math.min(3,ud.eco.xp+1);alert('Tăng 1 XP!')}
-    else if(s.type==='speed'){const inc=ud.eco.incubators.find(i=>i.dna);if(inc)inc.startTime=Math.max(inc.startTime,Date.now()-inc.baseDuration+10000);}
-    save();updateUI();
+        let r='common', roll=Math.random();
+        if(s.type==='gacha_c') r = roll<0.15 ? 'rare' : 'common'; else if(s.type==='gacha_r') r = roll<0.15 ? 'epic' : (roll<0.8 ? 'rare' : 'common'); else if(s.type==='gacha_e') r = roll<0.10 ? 'legendary' : (roll<0.75 ? 'epic' : 'rare'); else if(s.type==='gacha_l') r = roll<0.05 ? 'mythic' : (roll<0.75 ? 'legendary' : 'epic'); 
+        const c=genCreature(r); ud.eco.collection.push(c); alert(`🎉 Mở ra: ${c.name} (${c.rarity.toUpperCase()})! \n(Đã cất vào túi đồ)`);
+    }
+    save();updateUI(); renderShop();
 }
 
+/* ==========================================
+   MENU LAI TẠO (AI ĐẶT TÊN)
+   ========================================== */
+let breedSel={p1:null,p2:null};
+function pickBreed(slot){
+    let html = '';
+    ud.eco.collection.forEach((p, i) => { if(p.stage==='adult') html += `<div class="grid-item" onclick="selectForBreed(${slot}, 'col', ${i})"><img src="${p.imgUrl}"><div class="gi-name rarity-${p.rarity}">${p.name}</div><div class="type-badges">${renderTypeBadges(p.types)}</div></div>`; });
+    ud.eco.entities.forEach((e, i) => { if(e.dna && e.dna.stage==='adult') html += `<div class="grid-item" onclick="selectForBreed(${slot}, 'zoo', ${i})"><img src="${e.dna.imgUrl}"><div class="gi-name rarity-${e.dna.rarity}">${e.dna.name}</div><div class="type-badges">${renderTypeBadges(e.dna.types)}</div></div>`; });
+    if(!html) return showToast('Bạn chưa có thú trưởng thành nào!');
+    document.getElementById('pet-select-grid').innerHTML = html; document.getElementById('pet-select-title').innerText = "Chọn Thú Lai Tạo"; openModal('pet-select-modal');
+}
+function selectForBreed(slot, src, idx) {
+    const chosen = src === 'col' ? ud.eco.collection[idx] : ud.eco.entities[idx].dna;
+    if(slot===1) breedSel.p1=chosen; else breedSel.p2=chosen;
+    document.getElementById('slot'+slot).innerHTML=`<img src="${chosen.imgUrl}" style="width:100%;height:100%;object-fit:cover">`; document.getElementById('slot'+slot).classList.add('filled');
+    closeModal('pet-select-modal');
+}
+async function doBreed(){
+    if(!breedSel.p1||!breedSel.p2)return showToast('Hãy chọn đủ 2 thú!'); if(breedSel.p1===breedSel.p2)return showToast('Không thể lai cùng 1 thú!'); if(ud.coins<50)return showToast('Cần 50 Xu!');
+    const btn = document.querySelector('#breed-modal .btn-primary'); const oldText = btn.innerText; btn.innerText = "⏳ AI đang lai tạo..."; btn.disabled = true; ud.coins-=50;
+    
+    const child = await hybridize(breedSel.p1, breedSel.p2);
+    ud.eco.dna=child; ud.eco.xp=3; ud.hatchStart=Date.now();
+    save();updateUI();closeModal('breed-modal');
+    alert(`🧬 Lai thành công! Tên bé là "${child.name}" (${child.rarity.toUpperCase()})!\nTrứng mang hệ ${child.types.map(t=>TYPES[t].vn).join(', ')} đã sẵn sàng. Đợi 1 phút nở!`);
+    
+    breedSel={p1:null,p2:null}; document.getElementById('slot1').innerHTML='?';document.getElementById('slot1').classList.remove('filled'); document.getElementById('slot2').innerHTML='?';document.getElementById('slot2').classList.remove('filled');
+    btn.innerText = oldText; btn.disabled = false;
+}
+
+/* ==========================================
+   DAILY LIGIN
+   ========================================== */
 function checkDailyLogin(){if(ud.lastLogin!==new Date().toDateString())openModal('daily-modal')}
 function renderDaily(){
     const g=document.getElementById('daily-grid');g.innerHTML='';
-    for(let i=1;i<=7;i++){
-        const today=i===(ud.loginStreak+1),checked=i<=ud.loginStreak;
-        let c='day-box';if(today)c+=' active';if(checked)c+=' claimed';
-        g.innerHTML+=`<div class="${c}"><span>Ngày ${i}</span><b>${i===7?'20':'10'} Xu</b></div>`;
-    }
-    const btn=document.getElementById('claim-btn');
-    if(ud.lastLogin===new Date().toDateString()){btn.disabled=true;btn.innerText='Đã nhận'}
-    else{btn.disabled=false;btn.innerText='Nhận Thưởng'}
+    for(let i=1;i<=7;i++){ const today=i===(ud.loginStreak+1),checked=i<=ud.loginStreak; g.innerHTML+=`<div class="day-box ${today?'active':''} ${checked?'claimed':''}"><span>Ngày ${i}</span><b>${i===7?'20':'10'} Xu</b></div>`; }
+    const btn=document.getElementById('claim-btn'); if(ud.lastLogin===new Date().toDateString()){btn.disabled=true;btn.innerText='Đã nhận'} else{btn.disabled=false;btn.innerText='Nhận Thưởng'}
 }
 function claimDaily(){
-    const today=new Date(),last=new Date(ud.lastLogin);
-    if((today-last)/86400000>2)ud.loginStreak=0;
-    ud.loginStreak=(ud.loginStreak%7)+1;ud.lastLogin=today.toDateString();
-    const reward=ud.loginStreak===7?20:10;ud.coins+=reward;
-    document.getElementById('claim-msg').innerText=`+${reward} Xu! 🎉`;
-    save();updateUI();renderDaily();
+    const today=new Date(),last=new Date(ud.lastLogin); if((today-last)/86400000>2)ud.loginStreak=0;
+    ud.loginStreak=(ud.loginStreak%7)+1;ud.lastLogin=today.toDateString(); const reward=ud.loginStreak===7?20:10;ud.coins+=reward;
+    save();updateUI();renderDaily(); showToast(`Nhận thành công ${reward} Xu! 🎉`);
 }
 
-let breedSel={p1:null,p2:null};
-
-// ==========================================
-// LAI TẠO - THÔNG BÁO RÕ RÀNG
-// ==========================================
-function openBreedModal(){
-    const adults = [...ud.eco.collection.filter(c=>c.stage==='adult'), ...ud.eco.entities.map(e=>e.dna).filter(c=>c.stage==='adult')];
-    if(adults.length < 2){
-        alert('❌ Bạn cần ít nhất 2 thú trưởng thành để lai tạo!\n\nHãy thả thú vào Sở Thú hoặc nuôi lớn chúng trước.');
-        return;
-    }
-    const container=document.getElementById('breed-pet-list');
-    container.innerHTML=adults.map((pet,i)=>`
-        <div class="pet-select-item" onclick="selectBreedPet(${i},this)">
-            <img src="${pet.imgUrl}">
-            <div class="gi-name">${pet.name}</div>
-            <div class="gi-sub">${pet.rarity}</div>
-        </div>
-    `).join('');
-    openModal('breed-modal');
-}
-function selectBreedPet(idx,el){
-    const adults=[...ud.eco.collection.filter(c=>c.stage==='adult'),...ud.eco.entities.map(e=>e.dna).filter(c=>c.stage==='adult')];
-    if(!breedSel.p1){breedSel.p1=adults[idx];el.style.borderColor='var(--success)';return}
-    if(!breedSel.p2){breedSel.p2=adults[idx];el.style.borderColor='var(--success)';return}
-}
-function doBreed(){
-    if(!breedSel.p1||!breedSel.p2)return alert('Chọn đủ 2 thú!');
-    if(ud.coins<50)return alert('Cần 50 Xu!');
-    ud.coins-=50;const child=hybridize(breedSel.p1,breedSel.p2);
-    ud.eco.collection.push(child);
-    save();updateUI();closeModal('breed-modal');
-    alert(`Lai thành công! Nhận ngay ${child.name} (${child.rarity}) vào túi đồ!`);
-    breedSel={p1:null,p2:null};
-}
-
-let currentSelectCallback=null;
-function openPetSelectModal(action){
-    const adults=ud.eco.collection.filter(c=>c.stage==='adult');
-    const container=document.getElementById('pet-select-grid');
-    container.innerHTML=adults.map((pet,i)=>`
-        <div class="pet-select-item" onclick="handlePetSelect(${i},'${action}')">
-            <img src="${pet.imgUrl}">
-            <div>${pet.name}</div>
-        </div>
-    `).join('');
-    document.getElementById('pet-select-title').innerText=action==='release'?'Thả Thú Vào Sở Thú':'Chọn Thú';
-    currentSelectCallback=action;
-    openModal('pet-select-modal');
-}
-function handlePetSelect(idx,action){
-    closePetSelectModal();
-    if(action==='release'){
-        const pet=ud.eco.collection[idx];
-        ud.eco.entities.push({x:50+Math.random()*300,y:200+Math.random()*100,dna:pet,dx:0,dy:0});
-        ud.eco.collection.splice(idx,1);
-        save();alert('Đã thả thú!');
-    }
-}
-function closePetSelectModal(){closeModal('pet-select-modal')}
-
-// ==========================================
-// RỪNG & PVP (đã hoạt động)
-// ==========================================
-function openForestModal(){
-    const html=`
-        <div class="forest-option" onclick="startForestHunt('general')" style="cursor:pointer;padding:12px;border:2px solid var(--border);border-radius:12px;margin-bottom:8px"><b>🌲 Rừng Tổng Hợp</b><br>Giá: 20 Xu • Tỉ lệ đều</div>
-        <div class="forest-option" onclick="startForestHunt('fire')" style="cursor:pointer;padding:12px;border:2px solid var(--border);border-radius:12px;margin-bottom:8px"><b>🔥 Rừng Lửa</b><br>Giá: 50 Xu • Tỉ lệ Fire cao</div>
-        <div class="forest-option" onclick="startForestHunt('water')" style="cursor:pointer;padding:12px;border:2px solid var(--border);border-radius:12px;margin-bottom:8px"><b>💧 Rừng Nước</b><br>Giá: 50 Xu • Tỉ lệ Water cao</div>
-    `;
-    document.getElementById('forest-options').innerHTML=html;
-    document.getElementById('forest-hunt-area').classList.add('hidden');
-    document.getElementById('forest-options').classList.remove('hidden');
-    openModal('forest-modal');
-}
-let forestInterval=null,forestTime=60,forestLog=[];
-function startForestHunt(type){
-    if(ud.coins<(type==='general'?20:50))return alert('Không đủ Xu!');
-    ud.coins-=(type==='general'?20:50);
-    forestTime=60;forestLog=[];
-    document.getElementById('forest-options').classList.add('hidden');
-    document.getElementById('forest-hunt-area').classList.remove('hidden');
-    document.getElementById('forest-timer').innerText=forestTime;
-    document.getElementById('forest-log').innerHTML='';
-    forestInterval=setInterval(()=>{
-        forestTime--;
-        document.getElementById('forest-timer').innerText=forestTime;
-        if(forestTime<=0){
-            clearInterval(forestInterval);
-            alert('Hết thời gian săn!');
-            closeModal('forest-modal');
-        }
-    },1000);
-}
-function catchInForest(){
-    if(forestTime<=0)return;
-    const roll=Math.random();
-    let rarity='common';
-    if(roll<0.7)rarity='common';
-    else if(roll<0.9)rarity='rare';
-    else if(roll<0.98)rarity='ultra';
-    else if(roll<0.999)rarity='legendary';
-    else rarity='mythic';
-    const creature=genCreature(rarity);
-    ud.eco.collection.push(creature);
-    forestLog.unshift(`🎉 Bắt được ${creature.name} (${rarity})!`);
-    document.getElementById('forest-log').innerHTML=forestLog.map(l=>`<div style="padding:4px;border-bottom:1px solid #e2e8f0">${l}</div>`).join('');
-    save();updateUI();
-}
-
-function openPVPModal(){
-    alert('⚔️ PVP đang hoạt động!\nBạn sẽ chọn 5 thú để đấu với AI.\n(Phiên bản cơ bản)');
-    openModal('pvp-modal');
-}
-
-// ==========================================
-// SỞ THÚ - HIỂN THỊ ẢNH THÚ CƯNG
-// ==========================================
-let zooCvs=document.getElementById('zooCanvas');
-let zCtx=zooCvs.getContext('2d');
-let zooLoop,visitorT=0,zooImgs={};
+/* ==========================================
+   ZOO MỞ RỘNG
+   ========================================== */
+const zooCvs=document.getElementById('zooCanvas'); const zCtx=zooCvs.getContext('2d'); let zooLoop,visitorT=0,zooImgs={}; let floatingTexts = [];
 function renderZooAreaSelect(){
-    const sel=document.getElementById('zoo-area-select');
-    sel.innerHTML=ud.eco.areas.map(a=>`<option value="${a.id}">${a.name} (${a.entities.length}/10)</option>`).join('');
+    const sel=document.getElementById('zoo-area-select'); if(!sel) return; const curArea = ud.eco.currentArea || 1;
+    sel.innerHTML = ud.eco.areas.map(a => `<option value="${a.id}" ${a.id===curArea?'selected':''}>${a.name}</option>`).join('');
 }
-function changeZooArea(){initZoo();}
+function changeZooArea(){ ud.eco.currentArea = parseInt(document.getElementById('zoo-area-select').value); visitorT = 0; save(); initZoo(); }
+function buyZooArea() {
+    if(ud.coins < 500) return showToast('Bạn cần 500 Xu để mở rộng thêm Khu vực!'); ud.coins -= 500;
+    const newId = ud.eco.areas.length + 1; ud.eco.areas.push({id: newId, name: 'Khu ' + newId});
+    save(); updateUI(); renderZooAreaSelect(); showToast(`🏕️ Đã mở rộng thành công Khu ${newId}`);
+}
+zooCvs.addEventListener('click', (ev) => {
+    const rect = zooCvs.getBoundingClientRect(); const scaleX = zooCvs.width / rect.width; const scaleY = zooCvs.height / rect.height;
+    const x = (ev.clientX - rect.left) * scaleX; const y = (ev.clientY - rect.top) * scaleY; const curArea = ud.eco.currentArea || 1;
+    for (let i = ud.eco.entities.length - 1; i >= 0; i--) {
+        const e = ud.eco.entities[i]; if((e.area || 1) !== curArea) continue;
+        const size = e.dna.stage === 'baby' ? 24 : 34;
+        if (x >= e.x && x <= e.x + size && y >= e.y && y <= e.y + size) { openPetActionModal('zoo', i); break; }
+    }
+});
+function feedAll(){
+    const areaEntities = ud.eco.entities.filter(e => (e.area || 1) === ud.eco.currentArea);
+    if(!areaEntities.length) return showToast('Sở thú khu vực này trống trơn!'); if(ud.coins<5) return showToast('Không đủ 5 Xu mua đồ ăn!');
+    ud.coins-=5;save();updateUI();showToast('Tất cả thú cưng đều no nê! 🍖');
+}
+// SỬA LỖI MẤT HÌNH: Đổi key cache ảnh từ e.dna.type sang e.dna.imgUrl
 function initZoo(){
-    const wrap=zooCvs.parentElement;
-    zooCvs.width=wrap.clientWidth;zooCvs.height=wrap.clientHeight;
-    cancelAnimationFrame(zooLoop);visitorT=0;drawZoo();
+    const wrap=zooCvs.parentElement; zooCvs.width=wrap.clientWidth;zooCvs.height=wrap.clientHeight;
+    ud.eco.entities.forEach(e=>{ if(e.dna && !zooImgs[e.dna.imgUrl]){const img=new Image();img.src=e.dna.imgUrl;zooImgs[e.dna.imgUrl]=img} });
+    cancelAnimationFrame(zooLoop);drawZoo();
 }
 function drawZoo(){
-    const W=zooCvs.width,H=zooCvs.height;
-    zCtx.clearRect(0,0,W,H);
-    const sky=zCtx.createLinearGradient(0,0,0,H);
-    sky.addColorStop(0,'#bae6fd');sky.addColorStop(0.45,'#e0f2fe');sky.addColorStop(0.55,'#bbf7d0');sky.addColorStop(1,'#86efac');
-    zCtx.fillStyle=sky;zCtx.fillRect(0,0,W,H);
-    zCtx.fillStyle='#fbbf24';zCtx.beginPath();zCtx.arc(W-50,40,22,0,Math.PI*2);zCtx.fill();
-    zCtx.fillStyle='rgba(251,191,36,0.15)';zCtx.beginPath();zCtx.arc(W-50,40,35,0,Math.PI*2);zCtx.fill();
-    zCtx.fillStyle='rgba(255,255,255,0.7)';
-    [[60,30,25],[180,20,20],[320,40,22],[W-120,25,18]].forEach(([x,y,r])=>{zCtx.beginPath();zCtx.ellipse(x,y,r,r*0.45,0,0,Math.PI*2);zCtx.fill()});
-    zCtx.fillStyle='#86efac';zCtx.fillRect(0,H*0.6,W,H*0.4);
-    zCtx.fillStyle='#4ade80';zCtx.fillRect(0,H*0.6,W,4);
-    zCtx.fillStyle='#d4a373';zCtx.fillRect(0,H*0.78,W,14);
-    zCtx.fillStyle='#c2956e';zCtx.fillRect(0,H*0.78,W,2);
-    const flowers=['🌸','🌼','🌺','🌷','🌻'];
-    flowers.forEach((f,i)=>{zCtx.font='12px serif';zCtx.fillText(f,20+i*Math.floor(W/5),H*0.72)});
-    zCtx.strokeStyle='#92400e';zCtx.lineWidth=2;
-    for(let fx=15;fx<W;fx+=35){zCtx.beginPath();zCtx.moveTo(fx,H*0.6);zCtx.lineTo(fx,H*0.6+20);zCtx.stroke()}
-    zCtx.beginPath();zCtx.moveTo(0,H*0.6+10);zCtx.lineTo(W,H*0.6+10);zCtx.stroke();
-    zCtx.fillStyle='rgba(96,165,250,0.35)';zCtx.beginPath();zCtx.ellipse(W*0.8,H*0.88,35,14,0,0,Math.PI*2);zCtx.fill();
-    zCtx.fillStyle='rgba(255,255,255,0.15)';zCtx.beginPath();zCtx.ellipse(W*0.78,H*0.86,10,4,0,0,Math.PI*2);zCtx.fill();
-    [50,W*0.35,W*0.65,W-50].forEach(tx=>{
-        zCtx.fillStyle='#92400e';zCtx.fillRect(tx-3,H*0.5,6,H*0.1);
-        zCtx.fillStyle='#22c55e';zCtx.beginPath();zCtx.arc(tx,H*0.48,16,0,Math.PI*2);zCtx.fill();
-        zCtx.fillStyle='#15803d';zCtx.beginPath();zCtx.arc(tx-5,H*0.5,10,0,Math.PI*2);zCtx.fill();
+    const W=zooCvs.width,H=zooCvs.height; zCtx.clearRect(0,0,W,H);
+    const sky=zCtx.createLinearGradient(0,0,0,H); sky.addColorStop(0,'#bae6fd');sky.addColorStop(1,'#86efac');
+    zCtx.fillStyle=sky;zCtx.fillRect(0,0,W,H); zCtx.fillStyle='#86efac';zCtx.fillRect(0,H*0.6,W,H*0.4); zCtx.fillStyle='#4ade80';zCtx.fillRect(0,H*0.6,W,4);
+    const flowers=['🌸','🌼','🌺','🌷','🌻']; flowers.forEach((f,i)=>{zCtx.font='12px serif';zCtx.fillText(f,20+i*Math.floor(W/5),H*0.72)});
+
+    const curArea = ud.eco.currentArea || 1;
+    const areaEntities = ud.eco.entities.filter(e => (e.area || 1) === curArea);
+    areaEntities.forEach(e=>{
+        if(!e.dna)return; if(Math.random()<0.015){e.dx=(Math.random()-0.5)*1.2;e.dy=(Math.random()-0.5)*0.5}
+        e.x+=e.dx;e.y+=e.dy; e.x=Math.max(10,Math.min(W-45,e.x)); e.y=Math.max(H*0.62,Math.min(H-45,e.y));
+        const img=zooImgs[e.dna.imgUrl];
+        if(img&&img.complete&&img.naturalWidth>0){ const size = e.dna.stage === 'baby' ? 24 : 34; zCtx.drawImage(img,e.x,e.y,size,size); }
+        else{ zCtx.font='26px serif';zCtx.fillText(e.dna.e||'🐾',e.x,e.y+26); }
+        zCtx.fillStyle='rgba(0,0,0,0.45)';zCtx.font='bold 7px Nunito'; zCtx.fillText(e.dna.name,e.x,e.y-3);
     });
+
+    for(let i=floatingTexts.length-1; i>=0; i--){
+        let ft = floatingTexts[i]; zCtx.fillStyle = ft.c; zCtx.font = 'bold 13px Nunito'; zCtx.fillText(ft.text, ft.x, ft.y);
+        ft.y -= 0.6; ft.life--; if(ft.life <= 0) floatingTexts.splice(i, 1);
+    }
     
-    ud.eco.entities.forEach(e=>{
-        if(Math.random()<0.015){e.dx=(Math.random()-0.5)*1.2;e.dy=(Math.random()-0.5)*0.5}
-        e.x+=e.dx;e.y+=e.dy;
-        e.x=Math.max(10,Math.min(W-45,e.x));
-        e.y=Math.max(H*0.62,Math.min(H-45,e.y));
-
-        // Cache system cho ảnh để tránh tạo new Image() liên tục gây giật lag canvas
-        if(!zooImgs[e.dna.type]) {
-            zooImgs[e.dna.type] = new Image();
-            zooImgs[e.dna.type].src = e.dna.imgUrl;
+    visitorT++; const petCount = areaEntities.length; const spawnRate = Math.max(150, 500 - petCount * 25);
+    if(visitorT > spawnRate && petCount > 0){
+        const vx = W*0.3 + Math.sin(visitorT*0.02)*30; const visitorCount = 1 + Math.floor(petCount / 5);
+        zCtx.font='18px serif'; zCtx.fillText(visitorCount > 1 ? '🧑‍🤝‍🧑' : '🧑', vx, H*0.77);
+        if(visitorT > spawnRate + 150 && Math.random() < 0.025){
+            const reward = 5 * visitorCount; ud.coins += reward;
+            const toast = document.getElementById('visitor-toast'); toast.innerText = `🧑 ${visitorCount > 1 ? `Nhóm ${visitorCount} VIP` : 'Khách'} ghé thăm! +${reward} Xu`; toast.style.display = 'block'; setTimeout(()=>toast.style.display='none', 3000);
+            visitorT = 0; save(); updateUI();
         }
-
-        const img = zooImgs[e.dna.type];
-        if(img.complete && img.naturalWidth > 0){
-            zCtx.drawImage(img, e.x, e.y, 40, 40);
-        }else{
-            zCtx.font = '26px serif';
-            zCtx.fillText(e.dna.e || '🐾', e.x, e.y + 30);
-        }
-        zCtx.fillStyle='rgba(0,0,0,0.45)';zCtx.font='bold 7px Nunito';zCtx.fillText(e.dna.name,e.x,e.y-3);
-    });
-
-    visitorT++;
-    if(visitorT>300&&ud.eco.entities.length>3){
-        ud.coins+=Math.floor(ud.eco.entities.length/3);
-        const toast=document.getElementById('visitor-toast');
-        toast.style.display='block';
-        setTimeout(()=>toast.style.display='none',3000);
-        visitorT=0;save();updateUI();
     }
     zooLoop=requestAnimationFrame(drawZoo);
 }
 
-let session=[],cur=null,mode='meaning',wrongMap={},timerIv=null;
+/* ==========================================
+   LEARNING & MINIGAME (GIỮ NGUYÊN)
+   ========================================== */
+let session=[],cur=null,mode='meaning',timerIv=null;
 let matchPairs=[],matchSel=null,matchCount=0;
-let reviewModes=[],reviewIdx=0;
+let reviewModes=[],reviewIdx=0; let currentWave=1; let wave2Queue=[]; let wave2Errors={}; let totalWords=0; let completedWords=0;
 
 function startGame(){
-    if(!ud.data.length)return alert('Chưa có từ!');
-    const sl=document.getElementById('scopeSelect').value;
-    let sz=parseInt(document.getElementById('batchSize').value)||10;
-    mode=document.getElementById('gameMode').value;
-    let pool;
-    if(sl==='mastered')pool=ud.data.filter(x=>x.status==='mastered');
-    else if(sl==='learning')pool=ud.data.filter(x=>x.status!=='mastered');
-    else pool=[...ud.data];
-    if(!pool.length)return alert('Phạm vi trống!');
-    sz=Math.min(sz,pool.length);
-    pool=[...pool].sort(()=>Math.random()-0.5);
-    const seen=new Set();session=[];
-    for(const w of pool){if(!seen.has(w.word.toLowerCase())){seen.add(w.word.toLowerCase());session.push({...w,wrongCount:0});if(session.length>=sz)break}}
-    wrongMap={};
+    if(!ud.data.length)return showToast('Chưa có từ!');
+    const sl=document.getElementById('scopeSelect').value; let sz=parseInt(document.getElementById('batchSize').value)||10; mode=document.getElementById('gameMode').value;
+    let pool; if(sl==='mastered')pool=ud.data.filter(x=>x.status==='mastered'); else if(sl==='learning')pool=ud.data.filter(x=>x.status!=='mastered'); else pool=[...ud.data];
+    if(!pool.length)return showToast('Phạm vi trống!'); sz=Math.min(sz, pool.length); pool=[...pool].sort(()=>Math.random()-0.5);
+    const seen=new Set();session=[]; for(const w of pool){ if(!seen.has(w.word.toLowerCase())){ seen.add(w.word.toLowerCase()); session.push({...w}); if(session.length>=sz)break; } }
+    if(!session.length)return showToast('Không đủ từ!');
+    currentWave=1; wave2Queue=[]; wave2Errors={}; totalWords=session.length; completedWords=0;
     document.getElementById('learning-screen').classList.remove('hidden');
-    if(mode==='matching'){startMatching();return}
-    if(mode==='review'){reviewModes=['meaning','word','spelling','matching','timeattack'];reviewIdx=0;mode=reviewModes[0]}
-    showNext();
+    if(mode==='matching'){startMatching();return} if(mode==='review'){reviewModes=['meaning','word','spelling','matching','timeattack'];reviewIdx=0;mode=reviewModes[0]} showNext();
 }
 
 function showNext(){
     if(!session.length){
-        if(mode!=='review'||reviewIdx>=reviewModes.length-1){
-            document.getElementById('learning-screen').classList.add('hidden');
-            alert('🎉 Xong phiên học!');renderList();return;
+        if(currentWave===1 && wave2Queue.length>0){ currentWave=2; session=[...wave2Queue]; wave2Queue=[]; wave2Errors={}; session.forEach(w=>{wave2Errors[w.word.toLowerCase()]=0}); showNext(); return; }
+        if(mode==='review' && reviewIdx<reviewModes.length-1){
+            reviewIdx++;mode=reviewModes[reviewIdx]; const sl=document.getElementById('scopeSelect').value; let sz=parseInt(document.getElementById('batchSize').value)||10;
+            let pool; if(sl==='mastered')pool=ud.data.filter(x=>x.status==='mastered'); else if(sl==='learning')pool=ud.data.filter(x=>x.status!=='mastered'); else pool=[...ud.data];
+            sz=Math.min(sz,pool.length); pool=[...pool].sort(()=>Math.random()-0.5); session=pool.slice(0,sz).map(w=>({...w}));
+            if(!session.length){document.getElementById('learning-screen').classList.add('hidden');showToast('🎉 Xong ôn tập!');renderList();return}
+            currentWave=1;wave2Queue=[];wave2Errors={};totalWords=session.length;completedWords=0;
+            if(mode==='matching'){startMatching();return} showNext(); return;
         }
-        reviewIdx++;mode=reviewModes[reviewIdx];
-        let pool=document.getElementById('scopeSelect').value==='mastered'?ud.data.filter(x=>x.status==='mastered'):document.getElementById('scopeSelect').value==='learning'?ud.data.filter(x=>x.status!=='mastered'):[...ud.data];
-        pool=[...pool].sort(()=>Math.random()-0.5);
-        session=pool.slice(0,10).map(w=>({...w,wrongCount:0}));
-        if(mode==='matching'){startMatching();return}
+        clearInterval(timerIv); document.getElementById('learning-screen').classList.add('hidden'); showToast('🎉 Xong phiên học!');renderList(); return;
     }
-    document.getElementById('matching-area').classList.add('hidden');
-    document.getElementById('flashcard-area').classList.remove('hidden');
-    document.getElementById('answerInput').style.display='';
-    document.getElementById('checkBtn').style.display='';
-    cur=session[0];
-    const wk=cur.word.toLowerCase();
-    if(!wrongMap[wk])wrongMap[wk]=0;
-    document.getElementById('streak-display').innerText=`🔥 Streak: ${cur.streak||0}/3`;
-    document.getElementById('progress').innerText=`${session.length} từ`;
-    document.getElementById('result-message').innerText='';
-    document.getElementById('fc-hint').innerHTML='';
-    const fc=document.getElementById('fc-word'),spk=document.getElementById('speakBtn');
-    clearInterval(timerIv);document.getElementById('timer-bar').style.display='none';
-    if(mode==='spelling'){
-        fc.innerText='🎧 Nghe & viết...';spk.style.display='inline-block';speakCurrent();
-        document.getElementById('answerInput').placeholder='Viết từ bạn nghe...';
-    }else if(mode==='timeattack'){
-        const showW=Math.random()<.5;
-        if(showW){fc.innerText=cur.word;document.getElementById('answerInput').placeholder='Viết nghĩa tiếng Việt...'}
-        else{fc.innerText=cur.meaning;document.getElementById('answerInput').placeholder='Viết từ tiếng Anh...'}
-        cur._taMode=showW?'meaning':'word';
-        spk.style.display='none';
-        document.getElementById('timer-bar').style.display='block';
-        document.getElementById('timer-fill').style.width='100%';
-        let tl=10;timerIv=setInterval(()=>{tl--;document.getElementById('timer-fill').style.width=(tl/10*100)+'%';if(tl<=0){clearInterval(timerIv);document.getElementById('result-message').innerHTML=`<span style="color:var(--danger)">⏰ Hết giờ!</span>`;cur.streak=0;session.push(session.shift());setTimeout(showNext,1500)}},1000);
-    }else if(mode==='meaning'){
-        fc.innerText=cur.word;spk.style.display='none';
-        document.getElementById('answerInput').placeholder='Nhập nghĩa tiếng Việt...';
-    }else{
-        fc.innerText=cur.meaning;spk.style.display='none';
-        document.getElementById('answerInput').placeholder='Nhập từ tiếng Anh...';
-    }
+    document.getElementById('matching-area').classList.add('hidden'); document.getElementById('flashcard-area').classList.remove('hidden'); document.getElementById('answerInput').style.display=''; document.getElementById('checkBtn').style.display='';
+    cur=session[0]; document.getElementById('streak-display').innerText=`🔥 Streak: ${cur.streak||0}/3`; document.getElementById('wave-display').innerText=currentWave===1? `📋 Đợt 1 — Còn ${session.length} từ`: `🔄 Đợt 2 (Ôn sai) — Còn ${session.length} từ`; document.getElementById('progress').innerText=`${completedWords}/${totalWords}`; document.getElementById('result-message').innerText=''; document.getElementById('fc-hint').innerHTML='';
+    const fc=document.getElementById('fc-word'),spk=document.getElementById('speakBtn'); clearInterval(timerIv);document.getElementById('timer-bar').style.display='none';
+    if(mode==='spelling'){ fc.innerText='🎧 Nghe & viết...';spk.style.display='inline-block';speakCurrent(); document.getElementById('answerInput').placeholder='Viết từ bạn nghe...'; }else if(mode==='timeattack'){ const showW=Math.random()<.5; if(showW){fc.innerText=cur.word;document.getElementById('answerInput').placeholder='Viết nghĩa tiếng Việt...'} else{fc.innerText=cur.meaning;document.getElementById('answerInput').placeholder='Viết từ tiếng Anh...'} cur._taMode=showW?'meaning':'word'; spk.style.display='none'; document.getElementById('timer-bar').style.display='block'; document.getElementById('timer-fill').style.width='100%'; document.getElementById('timer-fill').style.transition='none'; setTimeout(()=>{document.getElementById('timer-fill').style.transition='width 1s linear'},50); let tl=10; timerIv=setInterval(()=>{tl--;document.getElementById('timer-fill').style.width=(tl/10*100)+'%'; if(tl<=0){clearInterval(timerIv); const ans=cur._taMode==='meaning'?cur.meaning:cur.word; document.getElementById('result-message').innerHTML=`<span style="color:var(--danger)">⏰ Hết giờ! Đáp án: ${ans}</span>`; handleWrong(); setTimeout(showNext,2000); } },1000); }else if(mode==='meaning'){ fc.innerText=cur.word;spk.style.display='none'; document.getElementById('answerInput').placeholder='Nhập nghĩa tiếng Việt...'; }else{ fc.innerText=cur.meaning;spk.style.display='none'; document.getElementById('answerInput').placeholder='Nhập từ tiếng Anh...'; }
     document.getElementById('answerInput').value='';document.getElementById('answerInput').focus();
 }
 
-function checkAnswer(){
-    if(mode==='matching')return;
-    clearInterval(timerIv);document.getElementById('timer-bar').style.display='none';
-    const v=document.getElementById('answerInput').value.trim().toLowerCase();if(!v)return;
-    let ok=false;
-    if(mode==='timeattack'){
-        ok=cur._taMode==='meaning'?cur.meaning.toLowerCase().includes(v):cur.word.toLowerCase()===v;
-    }else if(mode==='meaning'){
-        ok=cur.meaning.toLowerCase().includes(v)||v.includes(cur.meaning.toLowerCase());
-    }else{
-        ok=cur.word.toLowerCase()===v;
-    }
-    if(ok){
-        ud.coins+=5;
-        document.getElementById('result-message').innerHTML='<span style="color:var(--success)">✅ Chính xác! +5 Xu</span>';
-        const orig=ud.data.find(w=>w.word===cur.word);
-        if(orig){
-            orig.streak=(orig.streak||0)+1;
-            cur.streak=orig.streak;
-            if(orig.streak>=3&&orig.status!=='mastered'){
-                orig.status='mastered';
-                const reward=LEVEL_COINS[orig.cefr]||10;
-                ud.coins+=reward;
-                document.getElementById('result-message').innerHTML+=`<br><span style="color:var(--coin)">🎉 +${reward} Xu (${orig.cefr})</span>`;
-                gainXp();
-            }
-        }
-        session.shift();
-        save();updateUI();
-        setTimeout(showNext,900);
-    }else{
-        cur.wrongCount=(cur.wrongCount||0)+1;
-        if(cur.wrongCount===1){
-            session.push(session.shift());
-            document.getElementById('result-message').innerHTML='<span style="color:var(--danger)">❌ Sai đợt 1 → Đẩy về sau</span>';
-        }else if(cur.wrongCount===2){
-            document.getElementById('fc-hint').innerHTML=`📖 ${cur.definition||'Không có định nghĩa'}`;
-            document.getElementById('result-message').innerHTML='<span style="color:var(--danger)">❌ Sai đợt 2 → Xem định nghĩa</span>';
-        }else{
-            const ans=(mode==='meaning')?cur.meaning:cur.word;
-            document.getElementById('fc-hint').innerHTML=`💡 Đáp án: <b>${ans}</b>`;
-            document.getElementById('result-message').innerHTML='<span style="color:var(--danger)">❌ Sai! Đáp án đã hiện</span>';
-        }
-        cur.streak=0;
-        const orig=ud.data.find(w=>w.word===cur.word);if(orig)orig.streak=0;
-        save();
-        setTimeout(showNext,cur.wrongCount>=2?2500:1200);
-    }
-}
-
-function startMatching(){
-    document.getElementById('flashcard-area').classList.add('hidden');
-    document.getElementById('matching-area').classList.remove('hidden');
-    document.getElementById('answerInput').style.display='none';
-    document.getElementById('checkBtn').style.display='none';
-    const count=Math.min(5,session.length);
-    matchPairs=session.slice(0,count);matchSel=null;matchCount=0;
-    const eng=matchPairs.map((w,i)=>({text:w.word,idx:i,type:'eng'})).sort(()=>Math.random()-0.5);
-    const vie=matchPairs.map((w,i)=>({text:w.meaning,idx:i,type:'vie'})).sort(()=>Math.random()-0.5);
-    const c=document.getElementById('matching-area');
-    c.innerHTML='<div class="match-area"><div class="match-col" id="mcol-eng"></div><div class="match-col" id="mcol-vie"></div></div>';
-    eng.forEach(it=>{const d=document.createElement('div');d.className='match-item';d.textContent=it.text;d.dataset.idx=it.idx;d.dataset.type=it.type;d.onclick=()=>matchClick(d);document.getElementById('mcol-eng').appendChild(d)});
-    vie.forEach(it=>{const d=document.createElement('div');d.className='match-item';d.textContent=it.text;d.dataset.idx=it.idx;d.dataset.type=it.type;d.onclick=()=>matchClick(d);document.getElementById('mcol-vie').appendChild(d)});
-    document.getElementById('progress').innerText=`Nối ${count} cặp`;
-    document.getElementById('streak-display').innerText='🔗 Nối từ tương ứng';
-    document.getElementById('result-message').innerText='';
-}
-function matchClick(el){
-    if(el.classList.contains('matched'))return;
-    if(!matchSel){matchSel=el;el.classList.add('selected');return}
-    if(matchSel===el){el.classList.remove('selected');matchSel=null;return}
-    if(matchSel.dataset.type===el.dataset.type){matchSel.classList.remove('selected');matchSel=el;el.classList.add('selected');return}
-    if(matchSel.dataset.idx===el.dataset.idx){
-        matchSel.classList.remove('selected');matchSel.classList.add('matched');el.classList.add('matched');matchCount++;matchSel=null;
-        if(matchCount>=matchPairs.length){
-            document.getElementById('result-message').innerHTML='<span style="color:var(--success)">🎉 Hoàn thành!</span>';
-            matchPairs.forEach(w=>{const idx=session.findIndex(s=>s.word===w.word);if(idx>-1)session.splice(idx,1)});
-            ud.coins+=matchPairs.length*2;save();updateUI();
-            setTimeout(()=>{if(session.length>0&&mode==='matching')startMatching();else showNext()},1200);
-        }
-    }else{
-        el.classList.add('wrong');matchSel.classList.add('wrong');const ms=matchSel;
-        setTimeout(()=>{el.classList.remove('wrong','selected');ms.classList.remove('wrong','selected')},600);matchSel=null;
-    }
-}
+function handleCorrect(){ ud.coins+=5; let msg=`<span style="color:var(--success)">✅ Chính xác! +5 Xu</span>`; const orig=ud.data.find(w=>w.word===cur.word); if(orig && orig.status==='learning'){ orig.streak=(orig.streak||0)+1; if(orig.streak>=3){ orig.status='mastered'; const reward=LEVEL_COINS[orig.cefr||'B1']||20; ud.coins+=reward; msg+=`<br><span style="color:var(--coin)">🎉 Thuộc rồi! +${reward} Xu (${orig.cefr||'B1'})</span>`; gainXp(); } } document.getElementById('result-message').innerHTML=msg; session.shift(); completedWords++; save();updateUI(); setTimeout(showNext,900); }
+function handleWrong(){ const wk=cur.word.toLowerCase(); const orig=ud.data.find(w=>w.word===cur.word); if(orig) orig.streak=0; cur.streak=0; if(currentWave===1){ document.getElementById('result-message').innerHTML='<span style="color:var(--danger)">❌ Sai! Sẽ ôn lại ở đợt 2.</span>'; wave2Queue.push(session.shift()); document.querySelector('.learn-card').classList.add('shake'); setTimeout(()=>document.querySelector('.learn-card').classList.remove('shake'),500); save(); setTimeout(showNext,1200); } else { if(!wave2Errors[wk]) wave2Errors[wk]=0; wave2Errors[wk]++; document.querySelector('.learn-card').classList.add('shake'); setTimeout(()=>document.querySelector('.learn-card').classList.remove('shake'),500); if(wave2Errors[wk]===1){ document.getElementById('result-message').innerHTML='<span style="color:var(--danger)">❌ Sai!</span>'; document.getElementById('fc-hint').innerHTML=`📖 <i>${cur.definition||'No definition'}</i>`; save(); } else if(wave2Errors[wk]>=2){ const ans=(mode==='meaning'||(mode==='timeattack'&&cur._taMode==='meaning'))?cur.meaning:cur.word; document.getElementById('result-message').innerHTML='<span style="color:var(--danger)">❌ Sai!</span>'; document.getElementById('fc-hint').innerHTML=`📖 <i>${cur.definition||''}</i><br>💡 Đáp án: <b>${ans}</b>`; save(); session.shift(); completedWords++; setTimeout(showNext,2500); } } }
+function checkAnswer(){ if(mode==='matching')return; clearInterval(timerIv);document.getElementById('timer-bar').style.display='none'; const v=document.getElementById('answerInput').value.trim().toLowerCase();if(!v)return; let ok=false; if(mode==='timeattack'){ if(cur._taMode==='meaning')ok=cur.meaning.toLowerCase().includes(v)||v.includes(cur.meaning.toLowerCase()); else ok=cur.word.toLowerCase()===v; }else if(mode==='meaning')ok=cur.meaning.toLowerCase().includes(v)||v.includes(cur.meaning.toLowerCase()); else ok=cur.word.toLowerCase()===v; if(ok) handleCorrect(); else handleWrong(); }
+function startMatching(){ document.getElementById('flashcard-area').classList.add('hidden'); document.getElementById('matching-area').classList.remove('hidden'); document.getElementById('answerInput').style.display='none'; document.getElementById('checkBtn').style.display='none'; const count=Math.min(5,session.length); matchPairs=session.slice(0,count);matchSel=null;matchCount=0; const eng=matchPairs.map((w,i)=>({text:w.word,idx:i,type:'eng'})).sort(()=>Math.random()-0.5); const vie=matchPairs.map((w,i)=>({text:w.meaning,idx:i,type:'vie'})).sort(()=>Math.random()-0.5); const c=document.getElementById('matching-area'); c.innerHTML='<div class="match-area"><div class="match-col" id="mcol-eng"></div><div class="match-col" id="mcol-vie"></div></div>'; eng.forEach(it=>{const d=document.createElement('div');d.className='match-item';d.textContent=it.text;d.dataset.idx=it.idx;d.dataset.type=it.type;d.onclick=()=>matchClick(d);document.getElementById('mcol-eng').appendChild(d)}); vie.forEach(it=>{const d=document.createElement('div');d.className='match-item';d.textContent=it.text;d.dataset.idx=it.idx;d.dataset.type=it.type;d.onclick=()=>matchClick(d);document.getElementById('mcol-vie').appendChild(d)}); document.getElementById('progress').innerText=`Nối ${count} cặp`; document.getElementById('streak-display').innerText='🔗 Nối từ tương ứng'; document.getElementById('wave-display').innerText=''; document.getElementById('result-message').innerText=''; }
+function matchClick(el){ if(el.classList.contains('matched'))return; if(!matchSel){matchSel=el;el.classList.add('selected');return} if(matchSel===el){el.classList.remove('selected');matchSel=null;return} if(matchSel.dataset.type===el.dataset.type){matchSel.classList.remove('selected');matchSel=el;el.classList.add('selected');return} if(matchSel.dataset.idx===el.dataset.idx){ matchSel.classList.remove('selected');matchSel.classList.add('matched');el.classList.add('matched');matchCount++;matchSel=null; if(matchCount>=matchPairs.length){ document.getElementById('result-message').innerHTML='<span style="color:var(--success)">🎉 Hoàn thành!</span>'; matchPairs.forEach(w=>{ const idx=session.findIndex(s=>s.word===w.word); if(idx>-1){session.splice(idx,1);completedWords++} }); ud.coins+=matchPairs.length*5;save();updateUI(); setTimeout(()=>{if(session.length>0&&mode==='matching')startMatching();else showNext()},1200); } }else{ el.classList.add('wrong');matchSel.classList.add('wrong');const ms=matchSel; setTimeout(()=>{el.classList.remove('wrong','selected');ms.classList.remove('wrong','selected')},600);matchSel=null; } }
 function exitGame(){clearInterval(timerIv);document.getElementById('learning-screen').classList.add('hidden');document.getElementById('answerInput').style.display='';document.getElementById('checkBtn').style.display='';renderList()}
 function speakCurrent(){if(cur){const u=new SpeechSynthesisUtterance(cur.word);u.lang='en-US';u.rate=0.9;speechSynthesis.speak(u)}}
 
-function switchPage(name,el){
-    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-    document.getElementById(name+'-page').classList.add('active');
-    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-    if(el)el.classList.add('active');
-    if(name==='zoo')initZoo();
-    if(name==='words')renderList();
-}
+function switchPage(name,el){ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById(name+'-page').classList.add('active'); document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); if(el)el.classList.add('active'); if(name==='zoo')initZoo(); if(name==='words')renderList(); }
 function openModal(id){document.getElementById(id).classList.add('show');if(id==='shop-modal')renderShop();if(id==='inv-modal')renderInv('pet');if(id==='daily-modal')renderDaily()}
 function closeModal(id){document.getElementById(id).classList.remove('show')}
 
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('%c✅ Vocaby v2.2 - ĐÃ CẢI THIỆN LÒ ẤP + SHOP + HỆ + SỞ THÚ + LAI TẠO', 'color:#a855f7;font-weight:900');
-});
+document.addEventListener('DOMContentLoaded', () => { console.log('%c✅ Vocaby v10.0 - ULTIMATE PVP & TRAINING', 'color:#a855f7;font-weight:900'); });
 </script>
 </body>
 </html>
